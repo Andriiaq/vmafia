@@ -10,7 +10,7 @@ cur = conn.cursor()
 
 bot = telebot.TeleBot(config.token)
 
-GROUP1_ID = config.group_id
+GROUP_ID = config.group_id
 
 #
 # Актив
