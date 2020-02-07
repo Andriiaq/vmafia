@@ -60,7 +60,7 @@ def active(msg):
                         link = ''
                 if link:
                     bot.send_message(msg.chat.id, link[:-2], parse_mode='html')
-                bot.send_message(msg.chat.id, '‌‌‎‌‌‎', parse_mode='html')
+                bot.send_message(msg.chat.id, 'Ля, складно додатись чи що?‌‌‎‌‌‎', parse_mode='html')
             bot.send_message(msg.chat.id,
                              'Хочеш, щоб тебе також <b>кликали в гру</b>? <b>Додай</b> або <b>видали</b> себе сам. Обіцяємо, що <b>надокучати не будемо.</b> ♥',
                              reply_markup=keyboard, parse_mode='html')
@@ -98,7 +98,7 @@ def active(call):
                 temp_uids.append(temp_uid)
                 for temp_uid in temp_uids:
                     link += '<a href="tg://user?id={id}">{name}</a>, '.format(name=bot.get_chat_member(call.message.chat.id, temp_uid).user.first_name, id=temp_uid)
-                bot.edit_message_text(text='''Додано в <b>наступний</b> актив:
+                bot.edit_message_text(text='''Розбійники, які долучились в <b>наступний</b> актив:
 ''' + link[:-2], parse_mode='HTML', chat_id=call.message.chat.id, message_id=call.message.message_id - 1)
         elif call.data == 'text2':
             if len(uids) == 0 or uid not in uids:
@@ -111,14 +111,14 @@ def active(call):
                 if temp_uid in temp_uids:
                     temp_uids.remove(temp_uid)
                     if len(temp_uids) == 0:
-                        bot.edit_message_text(text='‌‌‎‌‌‎', parse_mode='HTML', chat_id=call.message.chat.id, message_id=call.message.message_id - 1)
+                        bot.edit_message_text(text='Ля, складно додатись чи що?‌‌‎‌‌‎', parse_mode='HTML', chat_id=call.message.chat.id, message_id=call.message.message_id - 1)
                 if not len(temp_uids) == 0:
                     for temp_uid in temp_uids:
                         link += '<a href="tg://user?id={id}">{name}</a>, '.format(name=bot.get_chat_member(call.message.chat.id, temp_uid).user.first_name, id=temp_uid)
-                    bot.edit_message_text(text='''Додано в <b>наступний</b> актив:
+                    bot.edit_message_text(text=''' Розбійники, які долучились в <b>наступний</b> актив:
 '''+ link[:-2], parse_mode='HTML', chat_id=call.message.chat.id, message_id=call.message.message_id - 1)
     else:
-        bot.answer_callback_query(callback_query_id=call.id, text='Щоб долучитися, потрібно приєднатися до чату..')
+        bot.answer_callback_query(callback_query_id=call.id, text='Щоб долучитися, потрібно приєднатися до чату.')
 
 
 #
