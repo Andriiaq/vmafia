@@ -121,7 +121,7 @@ def active(msg):
             if link:
                 bot.send_message(msg.chat.id, link[:-2], parse_mode='html')
             bot.send_message(msg.chat.id, '‌‌‎‌‌‎', parse_mode='html')
-        bot.send_message(msg.chat.id, 'Тест ДеплоюХочеш, щоб тебе також <b>кликали в гру</b>? <b>Додай</b> або <b>видали</b> себе сам. Обіцяємо, що <b>надокучати не будемо.</b> ♥', reply_markup=keyboard, parse_mode='html')
+        bot.send_message(msg.chat.id, 'Хочеш, щоб тебе також <b>кликали в гру</b>? <b>Додай</b> або <b>видали</b> себе сам. Обіцяємо, що <b>надокучати не будемо.</b> ♥', reply_markup=keyboard, parse_mode='html')
     else:
         print('you not admin')
 
