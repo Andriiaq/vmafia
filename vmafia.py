@@ -28,7 +28,7 @@ conn.commit()
 
 @bot.message_handler(commands=['актив'])
 def active(msg):
-    if msg.chat.id == GROUP_ID:
+    if not msg.chat.id == GROUP_ID:
         bot.send_message(msg.chat.id,
         '<a href="tg://user?id={}">{}</a>, чуєш, злодіяка, цей бот працює лише у чаті @vmafia.😁'.format(msg.from_user.id, msg.from_user.first_name), parse_mode="HTML")
     else:
@@ -179,4 +179,4 @@ def triggers(msg):
         conn.commit()
 
 
-bot.infinity_polling()
+bot.polling(none_stop=True)
