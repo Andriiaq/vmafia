@@ -29,7 +29,8 @@ conn.commit()
 @bot.message_handler(commands=['актив'])
 def active(msg):
     if not msg.chat.id == GROUP_ID:
-        print('Заборонено використовувати бот.')
+        bot.send_message(msg.chat.id,
+        '<a href="tg://user?id={}">{}</a>, чуєш, злодіяка, цей бот працює лише у чаті @vmafia.😁'.format(msg.from_user.id, msg.from_user.first_name), parse_mode="HTML")
     else:
         admins = [admin.user.id for admin in bot.get_chat_administrators(msg.chat.id)]
         if msg.from_user.id in admins:
