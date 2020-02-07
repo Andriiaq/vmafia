@@ -126,8 +126,8 @@ def triggers(msg):
 @bot.message_handler(content_types=["new_chat_members"])
 def triggers(msg):
     cid = msg.chat.id
-    uid = msg.from_user.id
-    user_name = msg.from_user.first_name
+    uid = msg.new_chat_member.id
+    user_name = msg.new_chat_member.first_name
     keyboard = types.InlineKeyboardMarkup()
     url_button = types.InlineKeyboardButton(text="Читати правила", url="https://t.me/vmbook")
     keyboard.add(url_button)
@@ -142,7 +142,7 @@ def triggers(msg):
 
 @bot.message_handler(content_types=["left_chat_member"])
 def triggers(msg):
-    uid = msg.from_user.id
+    uid = msg.left_chat_member.id
     if uid in all_uids:
         cur.execute('DELETE FROM all_members WHERE all_uids = %s', [uid])
         all_uids.remove(uid)
