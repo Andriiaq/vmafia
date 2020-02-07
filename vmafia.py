@@ -9,6 +9,7 @@ conn = psycopg2.connect(DATABASE_URL, sslmode='require')
 cur = conn.cursor()
 
 bot = telebot.TeleBot(config.token)
+GROUP_ID = -1001229855041
 
 #
 # Актив
@@ -27,50 +28,54 @@ conn.commit()
 
 @bot.message_handler(commands=['актив'])
 def active(msg):
-    admins = [admin.user.id for admin in bot.get_chat_administrators(msg.chat.id)]
-    if msg.from_user.id in admins:
-        temp_uids.clear()
-        keyboard = types.InlineKeyboardMarkup()
-        keyboard.row(
-            types.InlineKeyboardButton(text='Так, покличте мене 🥰', callback_data='text1')
-        )
-        keyboard.row(
-            types.InlineKeyboardButton(text='Не кличте мене 😕‍', callback_data='text2')
-        )
-        bot.send_message(msg.chat.id, text='<b>Шооооооооой</b>, до бою, <b>Мирнi</b>! 😂🐒♥️', parse_mode='html')
-        if len(uids) == 0:
-            bot.send_message(msg.chat.id, 'Будь першим')
-        else:
-            i = 0
-            link = ''
-            for uid in uids:
-                link += '<a href="tg://user?id={id}">{name}</a>, '.format(id=uid, name=bot.get_chat_member(msg.chat.id,
-                                                                                                           uid).user.first_name)
-                i += 1
-                if i % 5 == 0:
-                    bot.send_message(msg.chat.id, link[:-2], parse_mode='html')
-                    link = ''
-            if link:
-                bot.send_message(msg.chat.id, link[:-2], parse_mode='html')
-            bot.send_message(msg.chat.id, '‌‌‎‌‌‎', parse_mode='html')
-        bot.send_message(msg.chat.id,
-                         'Хочеш, щоб тебе також <b>кликали в гру</b>? <b>Додай</b> або <b>видали</b> себе сам. Обіцяємо, що <b>надокучати не будемо.</b> ♥',
-                         reply_markup=keyboard, parse_mode='html')
+    if not msg.chat.id == GROUP_ID:
+        print('Заборонено використовувати бот.')
     else:
-        cur.execute("SELECT msgid FROM delmsg")
-        msgid = cur.fetchone()
-        print(msgid)
-        bot.delete_message(msg.chat.id, msg.message_id)
-        if not msgid == None:
-            bot.delete_message(msg.chat.id, msgid)
-            cur.execute("DELETE FROM delmsg")
+        admins = [admin.user.id for admin in bot.get_chat_administrators(msg.chat.id)]
+        if msg.from_user.id in admins:
+            temp_uids.clear()
+            keyboard = types.InlineKeyboardMarkup()
+            keyboard.row(
+                types.InlineKeyboardButton(text='Так, покличте мене 🥰', callback_data='text1')
+            )
+            keyboard.row(
+                types.InlineKeyboardButton(text='Не кличте мене 😕‍', callback_data='text2')
+            )
+            bot.send_message(msg.chat.id, text='<b>Шооооооооой</b>, до бою, <b>Мирнi</b>! 😂🐒♥️', parse_mode='html')
+            if len(uids) == 0:
+                bot.send_message(msg.chat.id, 'Будь першим')
+            else:
+                i = 0
+                link = ''
+                for uid in uids:
+                    link += '<a href="tg://user?id={id}">{name}</a>, '.format(id=uid,
+                                                                              name=bot.get_chat_member(msg.chat.id,
+                                                                                                       uid).user.first_name)
+                    i += 1
+                    if i % 5 == 0:
+                        bot.send_message(msg.chat.id, link[:-2], parse_mode='html')
+                        link = ''
+                if link:
+                    bot.send_message(msg.chat.id, link[:-2], parse_mode='html')
+                bot.send_message(msg.chat.id, '‌‌‎‌‌‎', parse_mode='html')
+            bot.send_message(msg.chat.id,
+                             'Хочеш, щоб тебе також <b>кликали в гру</b>? <b>Додай</b> або <b>видали</b> себе сам. Обіцяємо, що <b>надокучати не будемо.</b> ♥',
+                             reply_markup=keyboard, parse_mode='html')
+        else:
+            cur.execute("SELECT msgid FROM delmsg")
+            msgid = cur.fetchone()
+            print(msgid)
+            bot.delete_message(msg.chat.id, msg.message_id)
+            if not msgid == None:
+                bot.delete_message(msg.chat.id, msgid)
+                cur.execute("DELETE FROM delmsg")
+                conn.commit()
+            msgadm = bot.send_message(msg.chat.id,
+                                      '<a href="tg://user?id={}">{}</a>, актив можуть надсилати лише адміни.😁'.format(
+                                          msg.from_user.id, msg.from_user.first_name), parse_mode="HTML")
+            cur.execute("INSERT INTO delmsg (msgid) VALUES (%s)", [msgadm.message_id])
             conn.commit()
-        msgadm = bot.send_message(msg.chat.id,
-                                  '<a href="tg://user?id={}">{}</a>, актив можуть надсилати лише адміни.😁'.format(
-                                      msg.from_user.id, msg.from_user.first_name), parse_mode="HTML")
-        cur.execute("INSERT INTO delmsg (msgid) VALUES (%s)", [msgadm.message_id])
-        conn.commit()
-        print(msgid)
+            print(msgid)
 
 
 @bot.callback_query_handler(func=lambda c: True)
@@ -173,4 +178,4 @@ def triggers(msg):
         conn.commit()
 
 
-bot.polling()
+bot.infinity_polling()
