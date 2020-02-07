@@ -16,10 +16,11 @@ temp_uids = []
 uids = []
 cur.execute("SELECT uids FROM active")
 uids = [a[0] for a in cur.fetchall()]
+#print(uids)
 all_uids = []
 cur.execute("SELECT all_uids FROM all_members")
+#print(all_uids)
 all_uids = [b[0] for b in cur.fetchall()]
-
 
 @bot.message_handler(commands=['актив'])
 def active(msg):
@@ -50,7 +51,7 @@ def active(msg):
             bot.send_message(msg.chat.id, '‌‌‎‌‌‎', parse_mode='html')
         bot.send_message(msg.chat.id, 'Хочеш, щоб тебе також <b>кликали в гру</b>? <b>Додай</b> або <b>видали</b> себе сам. Обіцяємо, що <b>надокучати не будемо.</b> ♥', reply_markup=keyboard, parse_mode='html')
     else:
-        print('you not admin')
+        bot.send_message(msg.chat.id, 'Актив можуть надсилати лише адміни.😁')
 
 @bot.callback_query_handler(func=lambda c: True)
 def active(call):
@@ -58,36 +59,39 @@ def active(call):
     temp_uid = call.from_user.id
     temp_uname = bot.get_chat_member(call.message.chat.id, call.from_user.id).user.first_name
     link = ""
-    if call.data == 'text1':
-        if uid in uids:
-            bot.answer_callback_query(callback_query_id=call.id, text='Ви вже є у списку.')
-        else:
-            cur.execute("INSERT INTO active (uids) VALUES (%s)", [call.from_user.id])
-            conn.commit()
-            uids.append(uid)
-            bot.answer_callback_query(callback_query_id=call.id, text='Вас додано до списку.')
-            temp_uids.append(temp_uid)
-            for temp_uid in temp_uids:
-                link += '<a href="tg://user?id={id}">{name}</a>, '.format(name=bot.get_chat_member(call.message.chat.id, temp_uid).user.first_name, id=temp_uid)
-            bot.edit_message_text(text='''Додано в <b>наступний</b> актив:
-''' + link[:-2], parse_mode='HTML', chat_id=call.message.chat.id, message_id=call.message.message_id - 1)
-    elif call.data == 'text2':
-        if len(uids) == 0 or uid not in uids:
-            bot.answer_callback_query(callback_query_id=call.id, text='Вас немає в наступному активі.')
-        else:
-            cur.execute('DELETE FROM active WHERE uids = %s', [call.from_user.id])
-            conn.commit()
-            uids.remove(uid)
-            bot.answer_callback_query(callback_query_id=call.id, text='Вас видалено з наступного активу.')
-            if temp_uid in temp_uids:
-                temp_uids.remove(temp_uid)
-                if len(temp_uids) == 0:
-                    bot.edit_message_text(text='‌‌‎‌‌‎', parse_mode='HTML', chat_id=call.message.chat.id, message_id=call.message.message_id - 1)
-            if not len(temp_uids) == 0:
+    if not bot.get_chat_member(call.message.chat.id, call.from_user.id).status == 'left':
+        if call.data == 'text1':
+            if uid in uids:
+                bot.answer_callback_query(callback_query_id=call.id, text='Ти вже є у списку.')
+            else:
+                cur.execute("INSERT INTO active (uids) VALUES (%s)", [call.from_user.id])
+                conn.commit()
+                uids.append(uid)
+                bot.answer_callback_query(callback_query_id=call.id, text='Тебе додано до списку.')
+                temp_uids.append(temp_uid)
                 for temp_uid in temp_uids:
-                    link += '<a href="tg://user?id={id}">{name}</a>, '.format(name=temp_uname, id=temp_uid)
+                    link += '<a href="tg://user?id={id}">{name}</a>, '.format(name=bot.get_chat_member(call.message.chat.id, temp_uid).user.first_name, id=temp_uid)
                 bot.edit_message_text(text='''Додано в <b>наступний</b> актив:
+''' + link[:-2], parse_mode='HTML', chat_id=call.message.chat.id, message_id=call.message.message_id - 1)
+        elif call.data == 'text2':
+            if len(uids) == 0 or uid not in uids:
+                bot.answer_callback_query(callback_query_id=call.id, text='Тебе немає в наступному активі.')
+            else:
+                cur.execute('DELETE FROM active WHERE uids = %s', [call.from_user.id])
+                conn.commit()
+                uids.remove(uid)
+                bot.answer_callback_query(callback_query_id=call.id, text='Тебе видалено з наступного активу.')
+                if temp_uid in temp_uids:
+                    temp_uids.remove(temp_uid)
+                    if len(temp_uids) == 0:
+                        bot.edit_message_text(text='‌‌‎‌‌‎', parse_mode='HTML', chat_id=call.message.chat.id, message_id=call.message.message_id - 1)
+                if not len(temp_uids) == 0:
+                    for temp_uid in temp_uids:
+                        link += '<a href="tg://user?id={id}">{name}</a>, '.format(name=temp_uname, id=temp_uid)
+                    bot.edit_message_text(text='''Додано в <b>наступний</b> актив:
 '''+ link[:-2], parse_mode='HTML', chat_id=call.message.chat.id, message_id=call.message.message_id - 1)
+    else:
+        bot.answer_callback_query(callback_query_id=call.id, text='Ти не учасник чату.')
 
 
 #
@@ -99,10 +103,10 @@ def triggers(msg):
     id = msg.from_user.id
     user_name = msg.from_user.first_name
     keyboard = types.InlineKeyboardMarkup()
-    url_button = types.InlineKeyboardButton(text='Читати правила гри', url='https://t.me/mafia_pravyla/14')
+    url_button = types.InlineKeyboardButton(text='Читати правила гри', url='https://t.me/vmbook')
     keyboard.add(url_button)
     bot.send_message(cid, text='''\
-    Якшо ти новий гравець, то натисни нижче, щоб прочитати правила гри. 🌹
+    Якщо ти новий гравець, то натисни нижче, щоб прочитати правила гри. 🌹
     '''.format(id, user_name), parse_mode='HTML', reply_markup=keyboard)
 
 
@@ -125,28 +129,27 @@ def triggers(msg):
     uid = msg.from_user.id
     user_name = msg.from_user.first_name
     keyboard = types.InlineKeyboardMarkup()
-    url_button = types.InlineKeyboardButton(text="Читати правила гри", url="https://t.me/mafia_pravyla/14")
+    url_button = types.InlineKeyboardButton(text="Читати правила", url="https://t.me/vmbook")
     keyboard.add(url_button)
     bot.send_message(cid, text='''\
 А ну всі швиденько <b>привітали нового гравця</b> <a href="tg://user?id={}">{}</a>! 🌝  Заходь та влаштовуйся позручніше, <b>бро</b>! ♥
 
 <b>Раді тобі</b> у нашому дружньому чаті. Тут лише <b>хороші</b> люди та приємна <b>атмосфера. Основна гра</b> у мафію починається <b>о 21:00</b>. Долучайся! 🌹
         '''.format(uid, user_name), parse_mode="HTML", reply_markup=keyboard)
-cur.execute("INSERT INTO active (uids) VALUES (%s)", [uid])
-conn.commit()
-uids.append(uid)
-
+    cur.execute("INSERT INTO active (uids) VALUES (%s)", [uid])
+    conn.commit()
+    uids.append(uid)
 
 @bot.message_handler(content_types=["left_chat_member"])
 def triggers(msg):
     uid = msg.from_user.id
-    cur.execute('DELETE FROM all_members WHERE all_uids = %s', [uid])
-    cur.execute('DELETE FROM active WHERE uids = %s', [uid])
-    all_uids.remove(uid)
-    conn.commit()
+    if uid in all_uids:
+        cur.execute('DELETE FROM all_members WHERE all_uids = %s', [uid])
+        all_uids.remove(uid)
     if uid in uids:
         cur.execute('DELETE FROM active WHERE uids = %s', [uid])
         uids.remove(uid)
-    print(all_uids)
+    conn.commit()
+
 
 bot.polling(none_stop=True)
