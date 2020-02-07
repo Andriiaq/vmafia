@@ -89,12 +89,12 @@ def active(call):
     if not bot.get_chat_member(call.message.chat.id, call.from_user.id).status == 'left':
         if call.data == 'text1':
             if uid in uids:
-                bot.answer_callback_query(callback_query_id=call.id, text='Ти вже є у списку.')
+                bot.answer_callback_query(callback_query_id=call.id, text='Ти вже є у активі.')
             else:
                 cur.execute("INSERT INTO active (uids) VALUES (%s)", [call.from_user.id])
                 conn.commit()
                 uids.append(uid)
-                bot.answer_callback_query(callback_query_id=call.id, text='Тебе додано до наступного активу.')
+                bot.answer_callback_query(callback_query_id=call.id, text='Тебе додано в наступний актив.')
                 temp_uids.append(temp_uid)
                 for temp_uid in temp_uids:
                     link += '<a href="tg://user?id={id}">{name}</a>, '.format(name=bot.get_chat_member(call.message.chat.id, temp_uid).user.first_name, id=temp_uid)
@@ -118,7 +118,7 @@ def active(call):
                     bot.edit_message_text(text='''Додано в <b>наступний</b> актив:
 '''+ link[:-2], parse_mode='HTML', chat_id=call.message.chat.id, message_id=call.message.message_id - 1)
     else:
-        bot.answer_callback_query(callback_query_id=call.id, text='Ти не учасник чату.')
+        bot.answer_callback_query(callback_query_id=call.id, text='Щоб долучитися, потрібно приєднатися до чату..')
 
 
 #
