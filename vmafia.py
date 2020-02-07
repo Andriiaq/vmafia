@@ -16,82 +16,9 @@ temp_uids = []
 uids = []
 cur.execute("SELECT uids FROM active")
 uids = [a[0] for a in cur.fetchall()]
-print(uids)
 all_uids = []
 cur.execute("SELECT all_uids FROM all_members")
-print(all_uids)
 all_uids = [b[0] for b in cur.fetchall()]
-
-
-step = {}
-true = ""
-
-
-@bot.message_handler(commands=['add'])
-def subscribe_chat(message):
-        step[true] = 1
-        bot.reply_to(message, "Перешліть повідомлення користувача, якого ви хочете додати в актив.")
-
-#@bot.message_handler(func=lambda message: step.get(true) == 1)
-#def add_user_active(m):
-#    if m.forward_from:
-#        print(step.get(true))
-#        fw_user = {'name': m.forward_from.first_name, 'id': m.forward_from.id}
-#        cur.execute("INSERT INTO active (uids) VALUES (%s)", [call.from_user.id])
-#        conn.commit()
-#        uids.append(user)
-#        bot.reply_to(m, "Користувача додано в актив.")
-#        step[true] = 0
-#    else:
-#        print('Not forward message')
-#        bot.reply_to(m, "Користувача не додано. Спробуйте ще раз.")
-#        step[true] = 0
-
-@bot.message_handler(commands=['add2'])
-def subscribe_chat(message):
-        step[true] = 1
-        bot.reply_to(message, "Перешліть повідомлення користувача, якого ви хочете додати в актив.")
-
-@bot.message_handler(func=lambda message: step.get(true) == 1)
-def add_user_active(m):
-#    if 1 not qwe:
-    if m.text == 'f({x, })':
-        print("1121")
-        uids.append(user)
-        bot.reply_to(m, "Користувачів додано в актив.")
-        step[true] = 0
-        ids = [m.text]
-        new_ids = [f'({x})' for x in ids]
-        print(new_ids)
-        s = ','.join(new_ids)
-        print(s)
-        query = cur.execute("INSERT INTO active (uids) VALUES {}".format(s))
-        conn.commit()
-#    else 1 == qwe:
-#        print('Not forward message')
-#        bot.reply_to(m, "Користувачів не додано. Спробуйте ще раз.")
-#        step[true] = 0
-
-
-@bot.message_handler(regexp='!r')
-def triggers(msg):
-    cid = msg.chat.id
-    id = msg.from_user.id
-    user_name = msg.from_user.first_name
-    keyboard = types.InlineKeyboardMarkup()
-    user = {'name': msg.from_user.first_name, 'id': msg.from_user.id}
-    test = cur.execute('DELETE FROM active')
-    test2 = cur.execute('DELETE FROM all_members')
-    print(test)
-    print(test2)
-    conn.commit()
-    bot.send_message(cid, text='''\
-    Актив очищено. 🌹
-    '''.format(id, user_name), parse_mode='HTML', reply_markup=keyboard)
-
-@bot.message_handler(commands=['1'])
-def active(msg):
-    print(msg.text)
 
 
 @bot.message_handler(commands=['актив'])
@@ -205,11 +132,10 @@ def triggers(msg):
 
 <b>Раді тобі</b> у нашому дружньому чаті. Тут лише <b>хороші</b> люди та приємна <b>атмосфера. Основна гра</b> у мафію починається <b>о 21:00</b>. Долучайся! 🌹
         '''.format(uid, user_name), parse_mode="HTML", reply_markup=keyboard)
-    cur.execute("INSERT INTO all_members (all_uids) VALUES (%s)", [uid])
+cur.execute("INSERT INTO active (uids) VALUES (%s)", [uid])
+conn.commit()
+uids.append(uid)
 
-    conn.commit()
-    all_uids.append(uid)
-    print(all_uids)
 
 @bot.message_handler(content_types=["left_chat_member"])
 def triggers(msg):
