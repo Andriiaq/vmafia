@@ -4,12 +4,13 @@ import telebot
 from telebot import types
 import psycopg2
 
-DATABASE_URL = 'postgres://wommmmevwhfpyr:1b5d073a1c84d111c9969c64494ba324f5260049ce5b9f0672885ded3616fcbd@ec2-54-246-89-234.eu-west-1.compute.amazonaws.com:5432/d44hnvrm79hna6'
-conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+DATABASE_URL = config.database_url
+conn = psycopg2.connect(DATABASE_URL)
 cur = conn.cursor()
 
 bot = telebot.TeleBot(config.token)
-GROUP_ID = -1001229855041
+
+GROUP_ID = config.group_id
 
 #
 # Актив
@@ -17,7 +18,7 @@ temp_uids = []
 uids = []
 cur.execute("SELECT uids FROM active")
 uids = [a[0] for a in cur.fetchall()]
-# print(uids)
+print(uids)
 
 
 # cur.execute("DELETE FROM active")
@@ -97,8 +98,7 @@ def active(call):
                 bot.answer_callback_query(callback_query_id=call.id, text='Тебе додано до списку.')
                 temp_uids.append(temp_uid)
                 for temp_uid in temp_uids:
-                    link += '<a href="tg://user?id={id}">{name}</a>, '.format(
-                        name=bot.get_chat_member(call.message.chat.id, temp_uid).user.first_name, id=temp_uid)
+                    link += '<a href="tg://user?id={id}">{name}</a>, '.format(name=bot.get_chat_member(call.message.chat.id, temp_uid).user.first_name, id=temp_uid)
                 bot.edit_message_text(text='''Додано в <b>наступний</b> актив:
 ''' + link[:-2], parse_mode='HTML', chat_id=call.message.chat.id, message_id=call.message.message_id - 1)
         elif call.data == 'text2':
@@ -112,13 +112,12 @@ def active(call):
                 if temp_uid in temp_uids:
                     temp_uids.remove(temp_uid)
                     if len(temp_uids) == 0:
-                        bot.edit_message_text(text='‌‌‎‌‌‎', parse_mode='HTML', chat_id=call.message.chat.id,
-                                              message_id=call.message.message_id - 1)
+                        bot.edit_message_text(text='‌‌‎‌‌‎', parse_mode='HTML', chat_id=call.message.chat.id, message_id=call.message.message_id - 1)
                 if not len(temp_uids) == 0:
                     for temp_uid in temp_uids:
-                        link += '<a href="tg://user?id={id}">{name}</a>, '.format(name=temp_uname, id=temp_uid)
+                        link += '<a href="tg://user?id={id}">{name}</a>, '.format(name=bot.get_chat_member(call.message.chat.id, temp_uid).user.first_name, id=temp_uid)
                     bot.edit_message_text(text='''Додано в <b>наступний</b> актив:
-''' + link[:-2], parse_mode='HTML', chat_id=call.message.chat.id, message_id=call.message.message_id - 1)
+'''+ link[:-2], parse_mode='HTML', chat_id=call.message.chat.id, message_id=call.message.message_id - 1)
     else:
         bot.answer_callback_query(callback_query_id=call.id, text='Ти не учасник чату.')
 
