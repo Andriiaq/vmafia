@@ -30,7 +30,8 @@ conn.commit()
 def active(msg):
     if not msg.chat.id == GROUP_ID:
         bot.send_message(msg.chat.id,
-        '<a href="tg://user?id={}">{}</a>, чуєш, злодіяка, цей бот працює лише у чаті @vmafia.😁'.format(msg.from_user.id, msg.from_user.first_name), parse_mode="HTML")
+                         '<a href="tg://user?id={}">{}</a>, чуєш, злодіяка, цей бот працює лише у чаті @vmafia.😁'.format(
+                             msg.from_user.id, msg.from_user.first_name), parse_mode="HTML")
     else:
         admins = [admin.user.id for admin in bot.get_chat_administrators(msg.chat.id)]
         if msg.from_user.id in admins:
@@ -122,6 +123,35 @@ def active(call):
         bot.answer_callback_query(callback_query_id=call.id, text='Ти не учасник чату.')
 
 
+#
+# Команди
+
+@bot.message_handler(regexp='!гайд')
+def triggers(msg):
+    cid = msg.chat.id
+    id = msg.from_user.id
+    user_name = msg.from_user.first_name
+    keyboard = types.InlineKeyboardMarkup()
+    url_button = types.InlineKeyboardButton(text='Читати правила гри', url='https://t.me/vmbook')
+    keyboard.add(url_button)
+    bot.send_message(cid, text='''\
+    Якщо ти новий гравець, то натисни нижче, щоб прочитати правила гри. 🌹
+    '''.format(id, user_name), parse_mode='HTML', reply_markup=keyboard)
+
+
+@bot.message_handler(regexp="!ходи")
+def triggers(msg):
+    cid = msg.chat.id
+    id = msg.from_user.id
+    user_name = msg.from_user.first_name
+    keyboard = types.InlineKeyboardMarkup()
+    url_button = types.InlineKeyboardButton(text="Виконати дії", url="https://t.me/TrueMafiaBot")
+    keyboard.add(url_button)
+    bot.send_message(cid, text='''\
+*Увага! Зараз ніч!* Гравці виконують *таємні дії* в діалозі з ботом @TrueMafiaBot, а в чаті панує повна тиша(бот видаляє повідомлення та тимчасово блокує за спроби написати).
+    '''.format(id, user_name), parse_mode="Markdown", reply_markup=keyboard)
+
+
 @bot.message_handler(content_types=["new_chat_members"])
 def triggers(msg):
     if not msg.new_chat_member.is_bot == True:
@@ -150,4 +180,5 @@ def triggers(msg):
         conn.commit()
 
 
-bot.polling(none_stop=True)
+if __name__ == '__main__':
+     bot.polling(none_stop=True)
