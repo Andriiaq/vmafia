@@ -85,7 +85,6 @@ def active(msg):
 def active(call):
     uid = call.from_user.id
     temp_uid = call.from_user.id
-    temp_uname = bot.get_chat_member(call.message.chat.id, call.from_user.id).user.first_name
     link = ""
     if not bot.get_chat_member(call.message.chat.id, call.from_user.id).status == 'left':
         if call.data == 'text1':
@@ -125,32 +124,6 @@ def active(call):
 #
 # Команди
 
-@bot.message_handler(regexp='!гайд')
-def triggers(msg):
-    cid = msg.chat.id
-    id = msg.from_user.id
-    user_name = msg.from_user.first_name
-    keyboard = types.InlineKeyboardMarkup()
-    url_button = types.InlineKeyboardButton(text='Читати правила гри', url='https://t.me/vmbook')
-    keyboard.add(url_button)
-    bot.send_message(cid, text='''\
-    Якщо ти новий гравець, то натисни нижче, щоб прочитати правила гри. 🌹
-    '''.format(id, user_name), parse_mode='HTML', reply_markup=keyboard)
-
-
-@bot.message_handler(regexp="!ходи")
-def triggers(msg):
-    cid = msg.chat.id
-    id = msg.from_user.id
-    user_name = msg.from_user.first_name
-    keyboard = types.InlineKeyboardMarkup()
-    url_button = types.InlineKeyboardButton(text="Виконати дії", url="https://t.me/TrueMafiaBot")
-    keyboard.add(url_button)
-    bot.send_message(cid, text='''\
-*Увага! Зараз ніч!* Гравці виконують *таємні дії* в діалозі з ботом @TrueMafiaBot, а в чаті панує повна тиша(бот видаляє повідомлення та тимчасово блокує за спроби написати).
-    '''.format(id, user_name), parse_mode="Markdown", reply_markup=keyboard)
-
-
 @bot.message_handler(content_types=["new_chat_members"])
 def triggers(msg):
     if not msg.new_chat_member.is_bot == True:
@@ -163,7 +136,7 @@ def triggers(msg):
         bot.send_message(cid, text='''\
     А ну всі швиденько <b>привітали нового гравця</b> <a href="tg://user?id={}">{}</a>! 🌝  Заходь та влаштовуйся позручніше, <b>бро</b>! ♥
 
-    <b>Раді тобі</b> у нашому дружньому чаті. Тут лише <b>хороші</b> люди та приємна <b>атмосфера. Основна гра</b> у мафію починається <b>о 21:00</b>. Долучайся! 🌹
+<b>Раді тобі</b> у нашому дружньому чаті. Тут лише <b>хороші</b> люди та приємна <b>атмосфера. Основна гра</b> у мафію починається <b>о 21:00</b>. Долучайся! 🌹
     '''.format(uid, user_name), parse_mode="HTML", reply_markup=keyboard)
         cur.execute("INSERT INTO active (uids) VALUES (%s)", [uid])
         conn.commit()
