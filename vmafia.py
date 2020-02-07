@@ -94,7 +94,7 @@ def active(call):
                 cur.execute("INSERT INTO active (uids) VALUES (%s)", [call.from_user.id])
                 conn.commit()
                 uids.append(uid)
-                bot.answer_callback_query(callback_query_id=call.id, text='Тебе додано до списку.')
+                bot.answer_callback_query(callback_query_id=call.id, text='Тебе додано до наступного активу.')
                 temp_uids.append(temp_uid)
                 for temp_uid in temp_uids:
                     link += '<a href="tg://user?id={id}">{name}</a>, '.format(name=bot.get_chat_member(call.message.chat.id, temp_uid).user.first_name, id=temp_uid)
