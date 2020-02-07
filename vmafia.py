@@ -30,7 +30,7 @@ conn.commit()
 
 @bot.message_handler(commands=['актив'])
 def active(msg):
-    if not msg.chat.id == GROUP_ID or msg.chat.id == GROUP2_ID2:
+    if not msg.chat.id == GROUP_ID:
         bot.send_message(msg.chat.id,
                          '<a href="tg://user?id={}">{}</a>, чуєш, злодіяка, цей бот працює лише у чаті @vmafia.😁'.format(
                              msg.from_user.id, msg.from_user.first_name), parse_mode="HTML")
