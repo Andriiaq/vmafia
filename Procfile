@@ -1,0 +1,1 @@
+worker: python vmafia.py $PORT
