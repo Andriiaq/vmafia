@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import config
+import text
 import telebot
 from telebot import types
 import psycopg2
@@ -19,7 +20,6 @@ uids = []
 cur.execute("SELECT uids FROM active")
 uids = [a[0] for a in cur.fetchall()]
 print(uids)
-
 
 cur.execute("DELETE FROM active")
 cur.execute("SELECT msgid FROM delmsg")
@@ -97,7 +97,8 @@ def active(call):
                 bot.answer_callback_query(callback_query_id=call.id, text='Тебе додано в наступний актив.')
                 temp_uids.append(temp_uid)
                 for temp_uid in temp_uids:
-                    link += '<a href="tg://user?id={id}">{name}</a>, '.format(name=bot.get_chat_member(call.message.chat.id, temp_uid).user.first_name, id=temp_uid)
+                    link += '<a href="tg://user?id={id}">{name}</a>, '.format(
+                        name=bot.get_chat_member(call.message.chat.id, temp_uid).user.first_name, id=temp_uid)
                 bot.edit_message_text(text='''Розбійники, які долучились в <b>наступний</b> актив:
 ''' + link[:-2], parse_mode='HTML', chat_id=call.message.chat.id, message_id=call.message.message_id - 1)
         elif call.data == 'text2':
@@ -111,12 +112,14 @@ def active(call):
                 if temp_uid in temp_uids:
                     temp_uids.remove(temp_uid)
                     if len(temp_uids) == 0:
-                        bot.edit_message_text(text='Ля, складно додатись чи що?‌‌‎‌‌‎', parse_mode='HTML', chat_id=call.message.chat.id, message_id=call.message.message_id - 1)
+                        bot.edit_message_text(text='Ля, складно додатись чи що?‌‌‎‌‌‎', parse_mode='HTML',
+                                              chat_id=call.message.chat.id, message_id=call.message.message_id - 1)
                 if not len(temp_uids) == 0:
                     for temp_uid in temp_uids:
-                        link += '<a href="tg://user?id={id}">{name}</a>, '.format(name=bot.get_chat_member(call.message.chat.id, temp_uid).user.first_name, id=temp_uid)
+                        link += '<a href="tg://user?id={id}">{name}</a>, '.format(
+                            name=bot.get_chat_member(call.message.chat.id, temp_uid).user.first_name, id=temp_uid)
                     bot.edit_message_text(text=''' Розбійники, які долучились в <b>наступний</b> актив:
-'''+ link[:-2], parse_mode='HTML', chat_id=call.message.chat.id, message_id=call.message.message_id - 1)
+''' + link[:-2], parse_mode='HTML', chat_id=call.message.chat.id, message_id=call.message.message_id - 1)
     else:
         bot.answer_callback_query(callback_query_id=call.id, text='Щоб долучитися, потрібно приєднатися до чату.')
 
@@ -128,8 +131,8 @@ def active(call):
 def triggers(msg):
     if not msg.chat.id == GROUP_ID:
         bot.send_message(msg.chat.id,
-        '<a href="tg://user?id={}">{}</a>, чуєш, злодіяка, цей бот працює лише у чаті @avmafia.😁'.format(
-        msg.from_user.id, msg.from_user.first_name), parse_mode="HTML")
+                         '<a href="tg://user?id={}">{}</a>, чуєш, злодіяка, цей бот працює лише у чаті @avmafia.😁'.format(
+                             msg.from_user.id, msg.from_user.first_name), parse_mode="HTML")
     else:
         if not msg.new_chat_member.is_bot == True:
             cid = msg.chat.id
@@ -140,7 +143,7 @@ def triggers(msg):
             keyboard.add(url_button)
             bot.send_message(cid, text='''\
         А ну всі швиденько <b>привітали нового гравця</b> <a href="tg://user?id={}">{}</a>! 🌝  Заходь та влаштовуйся позручніше, <b>бро</b>! ♥
-    
+
     <b>Раді тобі</b> у нашому дружньому чаті. Тут лише <b>хороші</b> люди та приємна <b>атмосфера. Основна гра</b> у мафію починається <b>о 21:00</b>. Долучайся! 🌹
         '''.format(uid, user_name), parse_mode="HTML", reply_markup=keyboard)
             cur.execute("INSERT INTO active (uids) VALUES (%s)", [uid])
@@ -152,14 +155,26 @@ def triggers(msg):
 def triggers(msg):
     if not msg.chat.id == GROUP_ID:
         bot.send_message(msg.chat.id,
-                        '<a href="tg://user?id={}">{}</a>, чуєш, злодіяка, цей бот працює лише у чаті @avmafia.😁'.format(
-                            msg.from_user.id, msg.from_user.first_name), parse_mode="HTML")
+                         '<a href="tg://user?id={}">{}</a>, чуєш, злодіяка, цей бот працює лише у чаті @avmafia.😁'.format(
+                             msg.from_user.id, msg.from_user.first_name), parse_mode="HTML")
     else:
         uid = msg.left_chat_member.id
         if uid in uids:
             cur.execute('DELETE FROM active WHERE uids = %s', [uid])
             uids.remove(uid)
             conn.commit()
+
+
+#
+# Команди
+
+@bot.message_handler(regexp='!гайд')
+def triggers(msg):
+    cid = msg.chat.id
+    keyboard = types.InlineKeyboardMarkup()
+    url_button = types.InlineKeyboardButton(text='Читати правила гри', url='https://t.me/mafia_pravyla')
+    keyboard.add(url_button)
+    bot.send_message(cid, text=text.guide, parse_mode='HTML', reply_markup=keyboard)
 
 
 bot.polling(none_stop=True)
