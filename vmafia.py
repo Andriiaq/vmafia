@@ -27,7 +27,15 @@ def triggers(msg):
     keyboard = types.InlineKeyboardMarkup()
     url_button = types.InlineKeyboardButton(text='Читати правила', url='https://t.me/mafia_pravyla')
     keyboard.add(url_button)
-    bot.send_message(cid, text=text.guide, parse_mode='HTML', reply_markup=keyboard)
+    msgbotdel = bot.send_message(cid, text=text.guide, parse_mode='HTML', reply_markup=keyboard)
+    ##### Вибрати та видалити id повідомлення
+    cur.execute("SELECT msg3 FROM delmsg")
+    delid = cur.fetchone()
+    if not None in delid:
+        bot.delete_message(msg.chat.id, delid)
+    cur.execute("UPDATE delmsg SET msg3 = %s", [msgbotdel.message_id])
+    conn.commit()
+    ##### Зберегти id поста
 
 
 #
@@ -44,6 +52,7 @@ print(uids)
 # cur.execute("DELETE FROM delmsg")
 cur.execute("UPDATE delmsg SET msg1 = NULL")
 cur.execute("UPDATE delmsg SET msg2 = NULL")
+cur.execute("UPDATE delmsg SET msg3 = NULL")
 
 conn.commit()
 
@@ -68,10 +77,9 @@ def triggers(msg):
             uids.append(msg.new_chat_member.id)
             ##### Вибрати та видалити id повідомлення
             cur.execute("SELECT msg2 FROM delmsg")
-            msg2 = cur.fetchone()
-            bot.delete_message(msg.chat.id, msg.message_id)
-            if not None in msg2:
-                bot.delete_message(msg.chat.id, msg2)
+            delid = cur.fetchone()
+            if not None in delid:
+                bot.delete_message(msg.chat.id, delid)
             cur.execute("UPDATE delmsg SET msg2 = %s", [msgbotdel.message_id])
             conn.commit()
             ##### Зберегти id поста
@@ -126,14 +134,13 @@ def active(msg):
             bot.send_message(msg.chat.id, text=text.actext3, reply_markup=keyboard, parse_mode='html')
         else:
             msgbotdel = bot.send_message(msg.chat.id, text=text.actonlyadm.format(msg.from_user.id), parse_mode="HTML")
+            bot.delete_message(msg.chat.id, msg.message_id)
             ##### Вибрати та видалити id повідомлення
             cur.execute("SELECT msg1 FROM delmsg")
-            msg1 = cur.fetchone()
-            bot.delete_message(msg.chat.id, msg.message_id)
-            if not None in msg1:
-                bot.delete_message(msg.chat.id, msg1)
+            delid = cur.fetchone()
+            if not None in delid:
+                bot.delete_message(msg.chat.id, delid)
             cur.execute("UPDATE delmsg SET msg1 = %s", [msgbotdel.message_id])
-            print(msg1)
             conn.commit()
             ##### Зберегти id поста
 
