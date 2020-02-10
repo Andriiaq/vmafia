@@ -41,6 +41,10 @@ cur.execute("SELECT uids FROM active")
 uids = [a[0] for a in cur.fetchall()]
 print(uids)
 
+# cur.execute("DELETE FROM delmsg")
+cur.execute("UPDATE delmsg SET msg1 = NULL")
+cur.execute("UPDATE delmsg SET msg2 = NULL")
+
 conn.commit()
 
 
@@ -54,13 +58,6 @@ def triggers(msg):
                          parse_mode="HTML")
     else:
         if not msg.new_chat_member.is_bot == True:
-            ##### Вибрати та видалити id повідомлення
-            cur.execute("SELECT msg2 FROM delmsg")
-            msg2 = cur.fetchone()
-            if not msg2 == None:
-                bot.delete_message(msg.chat.id, msg2)
-                cur.execute("DELETE FROM delmsg")
-            ##### Вибрати та видалити id повідомлення
             keyboard = types.InlineKeyboardMarkup()
             url_button = types.InlineKeyboardButton(text="Читати правила", url="https://t.me/mafia_pravyla")
             keyboard.add(url_button)
@@ -69,10 +66,15 @@ def triggers(msg):
                                          parse_mode="HTML", reply_markup=keyboard)
             cur.execute("INSERT INTO active (uids) VALUES (%s)", [msg.new_chat_member.id])
             uids.append(msg.new_chat_member.id)
-            ### Зберегти id поста
-            cur.execute("INSERT INTO delmsg (msg2) VALUES (%s)", [msgbotdel.message_id])
+            ##### Вибрати та видалити id повідомлення
+            cur.execute("SELECT msg2 FROM delmsg")
+            msg2 = cur.fetchone()
+            bot.delete_message(msg.chat.id, msg.message_id)
+            if not None in msg2:
+                bot.delete_message(msg.chat.id, msg2)
+            cur.execute("UPDATE delmsg SET msg2 = %s", [msgbotdel.message_id])
             conn.commit()
-            ### Зберегти id поста
+            ##### Зберегти id поста
 
 
 @bot.message_handler(content_types=["left_chat_member"])
@@ -123,20 +125,17 @@ def active(msg):
                 bot.send_message(msg.chat.id, text=text.actext2, parse_mode='html')
             bot.send_message(msg.chat.id, text=text.actext3, reply_markup=keyboard, parse_mode='html')
         else:
+            msgbotdel = bot.send_message(msg.chat.id, text=text.actonlyadm.format(msg.from_user.id), parse_mode="HTML")
             ##### Вибрати та видалити id повідомлення
             cur.execute("SELECT msg1 FROM delmsg")
             msg1 = cur.fetchone()
             bot.delete_message(msg.chat.id, msg.message_id)
-            if not msg1 == None:
+            if not None in msg1:
                 bot.delete_message(msg.chat.id, msg1)
-                cur.execute("DELETE FROM delmsg")
-            ##### Вибрати та видалити id повідомлення
-            msgbotdel = bot.send_message(msg.chat.id, text=text.actonlyadm.format(msg.from_user.id), parse_mode="HTML")
-            ### Зберегти id поста
-            cur.execute("INSERT INTO delmsg (msg1) VALUES (%s)", [msgbotdel.message_id])
+            cur.execute("UPDATE delmsg SET msg1 = %s", [msgbotdel.message_id])
             print(msg1)
             conn.commit()
-            ### Зберегти id поста
+            ##### Зберегти id поста
 
 
 @bot.callback_query_handler(func=lambda c: True)
