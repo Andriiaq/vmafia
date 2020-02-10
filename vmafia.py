@@ -196,4 +196,6 @@ def active(call):
 ''' + link[:-2], parse_mode='HTML', chat_id=call.message.chat.id, message_id=call.message.message_id - 1)
 
 
+
+
 bot.polling(none_stop=True)
