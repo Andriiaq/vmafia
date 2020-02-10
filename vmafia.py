@@ -36,10 +36,10 @@ def triggers(msg):
 
 temp_uids = []
 
-
 # cur.execute("DELETE FROM active")  # Удалить весь актив!!
 cur.execute("SELECT uids FROM active")
 uids = [a[0] for a in cur.fetchall()]
+print(uids)
 
 conn.commit()
 
@@ -152,6 +152,7 @@ def active(call):
                 bot.answer_callback_query(callback_query_id=call.id, text='Ти вже є у активі.')
             else:
                 cur.execute("INSERT INTO active (uids) VALUES (%s)", [call.from_user.id])
+                conn.commit()
                 uids.append(uid)
                 bot.answer_callback_query(callback_query_id=call.id, text='Тебе додано в наступний актив.')
                 temp_uids.append(temp_uid)
