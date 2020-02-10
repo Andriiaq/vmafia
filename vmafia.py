@@ -60,6 +60,15 @@ cur.execute("UPDATE delmsg SET msg3 = NULL")
 
 conn.commit()
 
+@bot.message_handler(regexp='!all')
+def triggers(msg):
+    admins = [admin.user.id for admin in bot.get_chat_administrators(GROUP_ID)]
+    if msg.from_user.id in admins:
+        cur.execute("SELECT uids FROM active UNION ALL SELECT list FROM all_uids")
+        list_uids = [b[0] for b in cur.fetchall()]
+        conn.commit()
+        print(list_uids)
+
 
 #
 # Вхід–Вихід
@@ -112,7 +121,7 @@ def active(msg):
         bot.send_message(msg.chat.id, text.notmafia.format(msg.from_user.id, msg.from_user.first_name),
                          parse_mode="HTML")
     else:
-        admins = [admin.user.id for admin in bot.get_chat_administrators(msg.chat.id)]
+        admins = [admin.user.id for admin in bot.get_chat_administrators(GROUP_ID)]
         if msg.from_user.id in admins:
             temp_uids.clear()
             bot.send_message(msg.chat.id, text=text.actext1, parse_mode='html')
@@ -192,10 +201,8 @@ def active(call):
                     for temp_uid in temp_uids:
                         link += '<a href="tg://user?id={id}">{name}</a>, '.format(
                             name=bot.get_chat_member(call.message.chat.id, temp_uid).user.first_name, id=temp_uid)
-                    bot.edit_message_text(text=''' Долучились в <b>наступний</b> актив:
+                    bot.edit_message_text(text='''Долучились в <b>наступний</b> актив: 
 ''' + link[:-2], parse_mode='HTML', chat_id=call.message.chat.id, message_id=call.message.message_id - 1)
-
-
 
 
 bot.polling(none_stop=True)
