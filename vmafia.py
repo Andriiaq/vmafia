@@ -36,11 +36,11 @@ def triggers(msg):
 
 temp_uids = []
 
+
+# cur.execute("DELETE FROM active")  # Удалить весь актив!!
 cur.execute("SELECT uids FROM active")
 uids = [a[0] for a in cur.fetchall()]
-print(uids)
-cur.execute("DELETE FROM active")
-print(uids)
+
 conn.commit()
 
 
@@ -95,7 +95,7 @@ def active(msg):
                          parse_mode="HTML")
     else:
         admins = [admin.user.id for admin in bot.get_chat_administrators(msg.chat.id)]
-        if not msg.from_user.id in admins:
+        if msg.from_user.id in admins:
             temp_uids.clear()
             bot.send_message(msg.chat.id, text=text.actext1, parse_mode='html')
             keyboard = types.InlineKeyboardMarkup()
