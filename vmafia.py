@@ -49,7 +49,11 @@ cur.execute("SELECT uids FROM active")
 uids = [a[0] for a in cur.fetchall()]
 print(uids)
 
-# cur.execute("DELETE FROM delmsg")
+cur.execute("SELECT list FROM all_uids")
+list_uids = [b[0] for b in cur.fetchall()]
+print(list_uids)
+
+
 cur.execute("UPDATE delmsg SET msg1 = NULL")
 cur.execute("UPDATE delmsg SET msg2 = NULL")
 cur.execute("UPDATE delmsg SET msg3 = NULL")
@@ -67,14 +71,17 @@ def triggers(msg):
                          parse_mode="HTML")
     else:
         if not msg.new_chat_member.is_bot == True:
+            uid = msg.new_chat_member.id
             keyboard = types.InlineKeyboardMarkup()
             url_button = types.InlineKeyboardButton(text="Читати правила", url="https://t.me/mafia_pravyla")
             keyboard.add(url_button)
             msgbotdel = bot.send_message(msg.chat.id,
-                                         text=text.hello.format(msg.new_chat_member.id, msg.new_chat_member.first_name),
+                                         text=text.hello.format(uid, msg.new_chat_member.first_name),
                                          parse_mode="HTML", reply_markup=keyboard)
-            cur.execute("INSERT INTO active (uids) VALUES (%s)", [msg.new_chat_member.id])
-            uids.append(msg.new_chat_member.id)
+            if not uid in uids:
+                cur.execute("INSERT INTO active (uids) VALUES (%s)", [uid])
+                cur.execute("INSERT INTO all_uids (list) VALUES (%s)", [uid])
+                uids.append(uid)
             ##### Вибрати та видалити id повідомлення
             cur.execute("SELECT msg2 FROM delmsg")
             delid = cur.fetchone()
@@ -94,8 +101,9 @@ def triggers(msg):
         uid = msg.left_chat_member.id
         if uid in uids:
             cur.execute('DELETE FROM active WHERE uids = %s', [uid])
-            uids.remove(uid)
+            cur.execute('DELETE FROM all_uids WHERE list = %s', [uid])
             conn.commit()
+            uids.remove(uid)
 
 
 @bot.message_handler(commands=['актив'])
