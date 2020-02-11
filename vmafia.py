@@ -44,7 +44,7 @@ def triggers(msg):
         conn.commit()
         bot.send_message(msg.chat.id, text.alladdact)
 
-@bot.message_handler(regexp='!гайд')
+@bot.message_handler(commands=['гайд', 'guide'])
 def triggers(msg):
     cid = msg.chat.id
     keyboard = types.InlineKeyboardMarkup()
@@ -130,7 +130,7 @@ def triggers(msg):
             uids.remove(uid)
 
 
-@bot.message_handler(commands=['актив'])
+@bot.message_handler(commands=['актив', 'active'])
 def active(msg):
     if not msg.chat.id == GROUP_ID:
         bot.send_message(msg.chat.id, text.notmafia.format(msg.from_user.id, msg.from_user.first_name),
