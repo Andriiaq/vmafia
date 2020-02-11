@@ -262,9 +262,11 @@ def triggers(msg):
 
 @bot.message_handler(regexp='!г')
 def triggers(msg):
-    bot.delete_message(msg.chat.id, msg.message_id)
-    next_game_message = bot.send_message(msg.chat.id, text.nextgame, parse_mode="HTML")
-    bot.pin_chat_message(msg.chat.id, next_game_message.message_id)
+    admins = [admin.user.id for admin in bot.get_chat_administrators(GROUP_ID)]
+    if msg.from_user.id in admins:
+        bot.delete_message(msg.chat.id, msg.message_id)
+        next_game_message = bot.send_message(msg.chat.id, text.nextgame, parse_mode="HTML")
+        bot.pin_chat_message(msg.chat.id, next_game_message.message_id)
 
 
 @bot.message_handler(regexp='!ban')
