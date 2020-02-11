@@ -32,7 +32,10 @@ def triggers(msg):
     cur.execute("SELECT msg3 FROM delmsg")
     delid = cur.fetchone()
     if not None in delid:
-        bot.delete_message(msg.chat.id, delid)
+        try:
+            bot.delete_message(msg.chat.id, delid)
+        except Exception:
+            cur.execute("UPDATE delmsg SET msg3 = NULL")
     cur.execute("UPDATE delmsg SET msg3 = %s", [msgbotdel.message_id])
     conn.commit()
     ##### Зберегти id поста
@@ -53,21 +56,7 @@ cur.execute("SELECT list FROM all_uids")
 list_uids = [b[0] for b in cur.fetchall()]
 print(list_uids)
 
-
-cur.execute("UPDATE delmsg SET msg1 = NULL")
-cur.execute("UPDATE delmsg SET msg2 = NULL")
-cur.execute("UPDATE delmsg SET msg3 = NULL")
-
 conn.commit()
-
-@bot.message_handler(regexp='!all')
-def triggers(msg):
-    admins = [admin.user.id for admin in bot.get_chat_administrators(GROUP_ID)]
-    if msg.from_user.id in admins:
-        cur.execute("SELECT uids FROM active UNION ALL SELECT list FROM all_uids")
-        list_uids = [b[0] for b in cur.fetchall()]
-        conn.commit()
-        print(list_uids)
 
 
 #
@@ -95,7 +84,10 @@ def triggers(msg):
             cur.execute("SELECT msg2 FROM delmsg")
             delid = cur.fetchone()
             if not None in delid:
-                bot.delete_message(msg.chat.id, delid)
+                try:
+                    bot.delete_message(msg.chat.id, delid)
+                except Exception:
+                    cur.execute("UPDATE delmsg SET msg2 = NULL")
             cur.execute("UPDATE delmsg SET msg2 = %s", [msgbotdel.message_id])
             conn.commit()
             ##### Зберегти id поста
@@ -122,7 +114,7 @@ def active(msg):
                          parse_mode="HTML")
     else:
         admins = [admin.user.id for admin in bot.get_chat_administrators(GROUP_ID)]
-        if msg.from_user.id in admins:
+        if not msg.from_user.id in admins:
             temp_uids.clear()
             bot.send_message(msg.chat.id, text=text.actext1, parse_mode='html')
             keyboard = types.InlineKeyboardMarkup()
@@ -156,7 +148,10 @@ def active(msg):
             cur.execute("SELECT msg1 FROM delmsg")
             delid = cur.fetchone()
             if not None in delid:
-                bot.delete_message(msg.chat.id, delid)
+                try:
+                        bot.delete_message(msg.chat.id, delid)
+                except Exception:
+                    cur.execute("UPDATE delmsg SET msg1 = NULL")
             cur.execute("UPDATE delmsg SET msg1 = %s", [msgbotdel.message_id])
             conn.commit()
             ##### Зберегти id поста
