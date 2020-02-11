@@ -114,7 +114,7 @@ def active(msg):
                          parse_mode="HTML")
     else:
         admins = [admin.user.id for admin in bot.get_chat_administrators(GROUP_ID)]
-        if not msg.from_user.id in admins:
+        if msg.from_user.id in admins:
             temp_uids.clear()
             bot.send_message(msg.chat.id, text=text.actext1, parse_mode='html')
             keyboard = types.InlineKeyboardMarkup()
@@ -198,6 +198,93 @@ def active(call):
                             name=bot.get_chat_member(call.message.chat.id, temp_uid).user.first_name, id=temp_uid)
                     bot.edit_message_text(text='''Долучились в <b>наступний</b> актив: 
 ''' + link[:-2], parse_mode='HTML', chat_id=call.message.chat.id, message_id=call.message.message_id - 1)
+
+@bot.message_handler(regexp='!addact')
+def triggers(msg):
+    if not msg.chat.id == GROUP_ID:
+        bot.send_message(msg.chat.id, text.notmafia.format(msg.from_user.id, msg.from_user.first_name),
+                         parse_mode="HTML")
+    else:
+        admins = [admin.user.id for admin in bot.get_chat_administrators(GROUP_ID)]
+        if msg.from_user.id in admins:
+            uid = msg.reply_to_message.from_user.id
+            print(uid)
+            if not uid in uids:
+                bot.send_message(msg.chat.id, text.addact.format(msg.from_user.id, msg.from_user.first_name),
+                                 parse_mode="HTML")
+                cur.execute("INSERT INTO active (uids) VALUES (%s)", [uid])
+                cur.execute("INSERT INTO all_uids (list) VALUES (%s)", [uid])
+                uids.append(uid)
+
+@bot.message_handler(regexp='!delact')
+def triggers(msg):
+    if not msg.chat.id == GROUP_ID:
+        bot.send_message(msg.chat.id, text.notmafia.format(msg.from_user.id, msg.from_user.first_name),
+                         parse_mode="HTML")
+    else:
+        admins = [admin.user.id for admin in bot.get_chat_administrators(GROUP_ID)]
+        if msg.from_user.id in admins:
+            uid = msg.reply_to_message.from_user.id
+            print(uid)
+            if uid in uids:
+                bot.send_message(msg.chat.id, text.delact.format(msg.from_user.id, msg.from_user.first_name),
+                                 parse_mode="HTML")
+                cur.execute('DELETE FROM active WHERE uids = %s', [uid])
+                cur.execute('DELETE FROM all_uids WHERE list = %s', [uid])
+                conn.commit()
+                uids.remove(uid)
+
+#
+# kick ban COMBOT
+
+@bot.message_handler(regexp='!ban')
+def triggers(msg):
+    if not msg.chat.id == GROUP_ID:
+        bot.send_message(msg.chat.id, text.notmafia.format(msg.from_user.id, msg.from_user.first_name),
+                         parse_mode="HTML")
+    else:
+        admins = [admin.user.id for admin in bot.get_chat_administrators(GROUP_ID)]
+        if msg.from_user.id in admins:
+            uid = msg.reply_to_message.from_user.id
+            print(uid)
+            if uid in uids:
+                cur.execute('DELETE FROM active WHERE uids = %s', [uid])
+                cur.execute('DELETE FROM all_uids WHERE list = %s', [uid])
+                conn.commit()
+                uids.remove(uid)
+
+@bot.message_handler(regexp='!kick')
+def triggers(msg):
+    if not msg.chat.id == GROUP_ID:
+        bot.send_message(msg.chat.id, text.notmafia.format(msg.from_user.id, msg.from_user.first_name),
+                         parse_mode="HTML")
+    else:
+        uid = msg.reply_to_message.from_user.id
+        print(uid)
+        if uid in uids:
+            cur.execute('DELETE FROM active WHERE uids = %s', [uid])
+            cur.execute('DELETE FROM all_uids WHERE list = %s', [uid])
+            conn.commit()
+            uids.remove(uid)
+
+@bot.message_handler(commands=['kick', 'ban'])
+def triggers(msg):
+    if not msg.chat.id == GROUP_ID:
+        bot.send_message(msg.chat.id, text.notmafia.format(msg.from_user.id, msg.from_user.first_name),
+                         parse_mode="HTML")
+    else:
+        admins = [admin.user.id for admin in bot.get_chat_administrators(GROUP_ID)]
+        if msg.from_user.id in admins:
+            uid = msg.reply_to_message.from_user.id
+            print(uid)
+            if uid in uids:
+                cur.execute('DELETE FROM active WHERE uids = %s', [uid])
+                cur.execute('DELETE FROM all_uids WHERE list = %s', [uid])
+                conn.commit()
+                uids.remove(uid)
+
+#
+# kick ban COMBOT
 
 
 bot.polling(none_stop=True)
