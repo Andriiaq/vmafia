@@ -21,6 +21,29 @@ GROUP_ID = config.group_id
 #
 # Команди
 
+@bot.message_handler(regexp='!testall')
+def triggers(msg):
+    admins = [admin.user.id for admin in bot.get_chat_administrators(GROUP_ID)]
+    if msg.from_user.id in admins:
+        cur.execute("SELECT list FROM all_uids")
+        list_uids = [b[0] for b in cur.fetchall()]
+        link = ''
+        for list_uid in list_uids:
+            link += '<a href="tg://user?id={id}">{name}</a>, '.format(id=list_uid,
+                                                                      name=bot.get_chat_member(msg.chat.id, list_uid).user.first_name)
+        if link:
+            bot.send_message(msg.chat.id, link[:-2], parse_mode='html')
+
+@bot.message_handler(regexp='!addall')
+def triggers(msg):
+    admins = [admin.user.id for admin in bot.get_chat_administrators(GROUP_ID)]
+    if msg.from_user.id in admins:
+        cur.execute("SELECT list FROM all_uids")
+        cur.execute("DELETE FROM active")  # Удалить весь актив!!
+        cur.execute("INSERT INTO active (uids) SELECT list FROM all_uids")
+        conn.commit()
+        bot.send_message(msg.chat.id, text.alladdact)
+
 @bot.message_handler(regexp='!гайд')
 def triggers(msg):
     cid = msg.chat.id
@@ -132,7 +155,7 @@ def active(msg):
                 for uid in uids:
                     link += '<a href="tg://user?id={id}">{name}</a>, '.format(id=uid,
                                                                               name=bot.get_chat_member(msg.chat.id,
-                                                                                                       uid).user.first_name)
+                                                                                                                   uid).user.first_name)
                     i += 1
                     if i % 5 == 0:
                         bot.send_message(msg.chat.id, link[:-2], parse_mode='html')
@@ -236,6 +259,13 @@ def triggers(msg):
 
 #
 # kick ban COMBOT
+
+@bot.message_handler(regexp='!г')
+def triggers(msg):
+    bot.delete_message(msg.chat.id, msg.message_id)
+    next_game_message = bot.send_message(msg.chat.id, text.nextgame, parse_mode="HTML")
+    bot.pin_chat_message(msg.chat.id, next_game_message.message_id)
+
 
 @bot.message_handler(regexp='!ban')
 def triggers(msg):
