@@ -109,7 +109,7 @@ def triggers(msg):
 
 @bot.message_handler(commands=['актив'])
 def active(msg):
-    if not msg.chat.id == GROUP_ID:
+    if not msg.chat.id == GROUP_ID or not msg.from_user.id == 730637480:
         bot.send_message(msg.chat.id, text.notmafia.format(msg.from_user.id, msg.from_user.first_name),
                          parse_mode="HTML")
     else:
