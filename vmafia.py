@@ -137,7 +137,7 @@ def active(msg):
                          parse_mode="HTML")
     else:
         admins = [admin.user.id for admin in bot.get_chat_administrators(GROUP_ID)]
-        if not msg.from_user.id in admins:
+        if msg.from_user.id in admins:
             temp_uids.clear()
             bot.send_message(msg.chat.id, text=text.actext1, parse_mode='html')
             keyboard = types.InlineKeyboardMarkup()
