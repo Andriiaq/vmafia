@@ -132,12 +132,12 @@ def triggers(msg):
 
 @bot.message_handler(commands=['актив', 'active'])
 def active(msg):
-    if not msg.chat.id == GROUP_ID:
+    if msg.chat.id == GROUP_ID:
         bot.send_message(msg.chat.id, text.notmafia.format(msg.from_user.id, msg.from_user.first_name),
                          parse_mode="HTML")
     else:
         admins = [admin.user.id for admin in bot.get_chat_administrators(GROUP_ID)]
-        if msg.from_user.id in admins:
+        if not msg.from_user.id in admins:
             temp_uids.clear()
             bot.send_message(msg.chat.id, text=text.actext1, parse_mode='html')
             keyboard = types.InlineKeyboardMarkup()
