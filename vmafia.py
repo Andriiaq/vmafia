@@ -3,7 +3,6 @@
 import config
 import text
 # Python Add-ons
-import sys
 import time
 import psycopg2
 import telebot
@@ -18,10 +17,10 @@ cur = conn.cursor()
 
 GROUP_ID = config.group_id
 
-
 #
 #
 # Команди
+
 
 @bot.message_handler(regexp='!testall')
 def triggers(msg):
