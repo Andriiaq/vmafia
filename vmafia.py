@@ -3,6 +3,8 @@
 import config
 import text
 # Python Add-ons
+import sys
+import time
 import psycopg2
 import telebot
 from telebot import types
@@ -42,7 +44,10 @@ def triggers(msg):
         cur.execute("DELETE FROM active")  # Удалить весь актив!!
         cur.execute("INSERT INTO active (uids) SELECT list FROM all_uids")
         conn.commit()
-        bot.send_message(msg.chat.id, text.alladdact)
+        msg_delete = bot.send_message(msg.chat.id, text.alladdact)
+        time.sleep(5)
+        bot.delete_message(msg.chat.id, msg.message_id)
+        bot.delete_message(msg.chat.id, msg_delete.message_id)
 
 @bot.message_handler(commands=['гайд', 'guide'])
 def triggers(msg):
@@ -78,7 +83,6 @@ print(uids)
 cur.execute("SELECT list FROM all_uids")
 list_uids = [b[0] for b in cur.fetchall()]
 print(list_uids)
-
 conn.commit()
 
 
@@ -222,10 +226,10 @@ def active(call):
                     bot.edit_message_text(text='''Долучились в <b>наступний</b> актив: 
 ''' + link[:-2], parse_mode='HTML', chat_id=call.message.chat.id, message_id=call.message.message_id - 1)
 
-@bot.message_handler(regexp='!addact')
+@bot.message_handler(regexp='!add')
 def triggers(msg):
     if not msg.chat.id == GROUP_ID:
-        bot.send_message(msg.chat.id, text.notmafia.format(msg.from_user.id, msg.from_user.first_name),
+        bot.send_message(msg.chat.id, text.notmafia.format(msg.from_user.id),
                          parse_mode="HTML")
     else:
         admins = [admin.user.id for admin in bot.get_chat_administrators(GROUP_ID)]
@@ -233,13 +237,29 @@ def triggers(msg):
             uid = msg.reply_to_message.from_user.id
             print(uid)
             if not uid in uids:
-                bot.send_message(msg.chat.id, text.addact.format(msg.from_user.id, msg.from_user.first_name),
+                if bot.get_chat_member(GROUP_ID, uid).status == 'member':
+                    msg_delete = bot.send_message(msg.chat.id, text.addact.format(msg.from_user.id),
+                                     parse_mode="HTML")
+                    cur.execute("INSERT INTO active (uids) VALUES (%s)", [uid])
+                    cur.execute("INSERT INTO all_uids (list) VALUES (%s)", [uid])
+                    uids.append(uid)
+                    time.sleep(2)
+                    bot.delete_message(msg.chat.id, msg.message_id)
+                    bot.delete_message(msg.chat.id, msg_delete.message_id)
+                else:
+                    msg_delete = bot.send_message(msg.chat.id, text.nochatmember.format(msg.from_user.id),
+                                     parse_mode="HTML")
+                    time.sleep(2)
+                    bot.delete_message(msg.chat.id, msg.message_id)
+                    bot.delete_message(msg.chat.id, msg_delete.message_id)
+            else:
+                msg_delete = bot.send_message(msg.chat.id, text.noaddact.format(msg.from_user.id),
                                  parse_mode="HTML")
-                cur.execute("INSERT INTO active (uids) VALUES (%s)", [uid])
-                cur.execute("INSERT INTO all_uids (list) VALUES (%s)", [uid])
-                uids.append(uid)
+                time.sleep(2)
+                bot.delete_message(msg.chat.id, msg.message_id)
+                bot.delete_message(msg.chat.id, msg_delete.message_id)
 
-@bot.message_handler(regexp='!delact')
+@bot.message_handler(regexp='!del')
 def triggers(msg):
     if not msg.chat.id == GROUP_ID:
         bot.send_message(msg.chat.id, text.notmafia.format(msg.from_user.id, msg.from_user.first_name),
@@ -250,12 +270,21 @@ def triggers(msg):
             uid = msg.reply_to_message.from_user.id
             print(uid)
             if uid in uids:
-                bot.send_message(msg.chat.id, text.delact.format(msg.from_user.id, msg.from_user.first_name),
+                msg_delete = bot.send_message(msg.chat.id, text.delact.format(msg.from_user.id, msg.from_user.first_name),
                                  parse_mode="HTML")
                 cur.execute('DELETE FROM active WHERE uids = %s', [uid])
                 cur.execute('DELETE FROM all_uids WHERE list = %s', [uid])
                 conn.commit()
                 uids.remove(uid)
+                time.sleep(2)
+                bot.delete_message(msg.chat.id, msg.message_id)
+                bot.delete_message(msg.chat.id, msg_delete.message_id)
+            else:
+                msg_delete = bot.send_message(msg.chat.id, text.delact.format(msg.from_user.id, msg.from_user.first_name),
+                                 parse_mode="HTML")
+                time.sleep(2)
+                bot.delete_message(msg.chat.id, msg.message_id)
+                bot.delete_message(msg.chat.id, msg_delete.message_id)
 
 #
 # kick ban COMBOT
