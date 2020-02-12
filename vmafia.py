@@ -238,8 +238,7 @@ def triggers(msg):
             print(uid)
             if not uid in uids:
                 if bot.get_chat_member(GROUP_ID, uid).status == 'member':
-                    msg_delete = bot.send_message(msg.chat.id, text.addact.format(msg.from_user.id),
-                                     parse_mode="HTML")
+                    msg_delete = bot.send_message(msg.chat.id, text.delact)
                     cur.execute("INSERT INTO active (uids) VALUES (%s)", [uid])
                     cur.execute("INSERT INTO all_uids (list) VALUES (%s)", [uid])
                     uids.append(uid)
@@ -247,14 +246,12 @@ def triggers(msg):
                     bot.delete_message(msg.chat.id, msg.message_id)
                     bot.delete_message(msg.chat.id, msg_delete.message_id)
                 else:
-                    msg_delete = bot.send_message(msg.chat.id, text.nochatmember.format(msg.from_user.id),
-                                     parse_mode="HTML")
+                    msg_delete = bot.send_message(msg.chat.id, text.delact)
                     time.sleep(3)
                     bot.delete_message(msg.chat.id, msg.message_id)
                     bot.delete_message(msg.chat.id, msg_delete.message_id)
             else:
-                msg_delete = bot.send_message(msg.chat.id, text.noaddact.format(msg.from_user.id),
-                                 parse_mode="HTML")
+                msg_delete = bot.send_message(msg.chat.id, text.delact)
                 time.sleep(3)
                 bot.delete_message(msg.chat.id, msg.message_id)
                 bot.delete_message(msg.chat.id, msg_delete.message_id)
@@ -262,16 +259,14 @@ def triggers(msg):
 @bot.message_handler(regexp='!del')
 def triggers(msg):
     if not msg.chat.id == GROUP_ID:
-        bot.send_message(msg.chat.id, text.notmafia.format(msg.from_user.id, msg.from_user.first_name),
-                         parse_mode="HTML")
+        msg_delete = bot.send_message(msg.chat.id, text.delact)
     else:
         admins = [admin.user.id for admin in bot.get_chat_administrators(GROUP_ID)]
         if msg.from_user.id in admins:
             uid = msg.reply_to_message.from_user.id
             print(uid)
             if uid in uids:
-                msg_delete = bot.send_message(msg.chat.id, text.delact.format(msg.from_user.id, msg.from_user.first_name),
-                                 parse_mode="HTML")
+                msg_delete = bot.send_message(msg.chat.id, text.delact)
                 cur.execute('DELETE FROM active WHERE uids = %s', [uid])
                 cur.execute('DELETE FROM all_uids WHERE list = %s', [uid])
                 conn.commit()
@@ -280,8 +275,7 @@ def triggers(msg):
                 bot.delete_message(msg.chat.id, msg.message_id)
                 bot.delete_message(msg.chat.id, msg_delete.message_id)
             else:
-                msg_delete = bot.send_message(msg.chat.id, text.delact.format(msg.from_user.id, msg.from_user.first_name),
-                                 parse_mode="HTML")
+                msg_delete = bot.send_message(msg.chat.id, text.delact)
                 time.sleep(3)
                 bot.delete_message(msg.chat.id, msg.message_id)
                 bot.delete_message(msg.chat.id, msg_delete.message_id)
