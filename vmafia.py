@@ -132,7 +132,7 @@ def triggers(msg):
 
 @bot.message_handler(commands=['актив', 'active'])
 def active(msg):
-    if msg.chat.id == GROUP_ID:
+    if not msg.chat.id == GROUP_ID:
         bot.send_message(msg.chat.id, text.notmafia.format(msg.from_user.id, msg.from_user.first_name),
                          parse_mode="HTML")
     else:
