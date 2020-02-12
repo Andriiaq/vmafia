@@ -226,7 +226,7 @@ def active(call):
                     bot.edit_message_text(text='''Долучились в <b>наступний</b> актив: 
 ''' + link[:-2], parse_mode='HTML', chat_id=call.message.chat.id, message_id=call.message.message_id - 1)
 
-@bot.message_handler(regexp='!add')
+@bot.message_handler(commands=['г'])
 def triggers(msg):
     if not msg.chat.id == GROUP_ID:
         bot.send_message(msg.chat.id, text.notmafia.format(msg.from_user.id),
@@ -283,7 +283,7 @@ def triggers(msg):
 #
 # kick ban COMBOT
 
-@bot.message_handler(regexp='!г')
+@bot.message_handler(regexp='!g')
 def triggers(msg):
     admins = [admin.user.id for admin in bot.get_chat_administrators(GROUP_ID)]
     if msg.from_user.id in admins:
