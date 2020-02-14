@@ -168,19 +168,10 @@ def active(msg):
                 bot.send_message(msg.chat.id, text=text.actext2, parse_mode='html')
             bot.send_message(msg.chat.id, text=text.actext3, reply_markup=keyboard, parse_mode='html')
         else:
-            msgbotdel = bot.send_message(msg.chat.id, text=text.actonlyadm.format(msg.from_user.id), parse_mode="HTML")
+            msg_delete = bot.send_message(msg.chat.id, text=text.actonlyadm.format(msg.from_user.id), parse_mode="HTML")
+            time.sleep(5)
             bot.delete_message(msg.chat.id, msg.message_id)
-            ##### Вибрати та видалити id повідомлення
-            cur.execute("SELECT msg1 FROM delmsg")
-            delid = cur.fetchone()
-            if not None in delid:
-                try:
-                        bot.delete_message(msg.chat.id, delid)
-                except Exception:
-                    cur.execute("UPDATE delmsg SET msg1 = NULL")
-            cur.execute("UPDATE delmsg SET msg1 = %s", [msgbotdel.message_id])
-            conn.commit()
-            ##### Зберегти id поста
+            bot.delete_message(msg.chat.id, msg_delete.message_id)
 
 
 @bot.callback_query_handler(func=lambda c: True)
@@ -255,7 +246,10 @@ def triggers(msg):
                 bot.delete_message(msg.chat.id, msg.message_id)
                 bot.delete_message(msg.chat.id, msg_delete.message_id)
         else:
-            bot.send_message(msg.chat.id, text.actonlyadm)
+            msg_delete = bot.send_message(msg.chat.id, text=text.onlyadm.format(msg.from_user.id), parse_mode="HTML")
+            time.sleep(5)
+            bot.delete_message(msg.chat.id, msg.message_id)
+            bot.delete_message(msg.chat.id, msg_delete.message_id)
 
 @bot.message_handler(commands=['del'])
 def triggers(msg):
@@ -280,7 +274,10 @@ def triggers(msg):
                 bot.delete_message(msg.chat.id, msg.message_id)
                 bot.delete_message(msg.chat.id, msg_delete.message_id)
         else:
-            bot.send_message(msg.chat.id, text.actonlyadm)
+            msg_delete = bot.send_message(msg.chat.id, text=text.onlyadm.format(msg.from_user.id), parse_mode="HTML")
+            time.sleep(5)
+            bot.delete_message(msg.chat.id, msg.message_id)
+            bot.delete_message(msg.chat.id, msg_delete.message_id)
 
 @bot.message_handler(commands=['del2'])
 def triggers(msg):
@@ -305,7 +302,10 @@ def triggers(msg):
                 bot.delete_message(msg.chat.id, msg.message_id)
                 bot.delete_message(msg.chat.id, msg_delete.message_id)
         else:
-            bot.send_message(msg.chat.id, text.actonlyadm)
+            msg_delete = bot.send_message(msg.chat.id, text=text.onlyadm.format(msg.from_user.id), parse_mode="HTML")
+            time.sleep(5)
+            bot.delete_message(msg.chat.id, msg.message_id)
+            bot.delete_message(msg.chat.id, msg_delete.message_id)
 
 #
 # kick ban COMBOT
@@ -318,7 +318,10 @@ def triggers(msg):
         next_game_message = bot.send_message(msg.chat.id, text.nextgame, parse_mode="HTML")
         bot.pin_chat_message(msg.chat.id, next_game_message.message_id)
     else:
-        bot.send_message(msg.chat.id, text.actonlyadm)
+        msg_delete = bot.send_message(msg.chat.id, text=text.onlyadm.format(msg.from_user.id), parse_mode="HTML")
+        time.sleep(5)
+        bot.delete_message(msg.chat.id, msg.message_id)
+        bot.delete_message(msg.chat.id, msg_delete.message_id)
 
 
 @bot.message_handler(regexp='!ban')
