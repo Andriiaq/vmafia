@@ -225,7 +225,7 @@ def active(call):
                     bot.edit_message_text(text='''Долучились в <b>наступний</b> актив: 
 ''' + link[:-2], parse_mode='HTML', chat_id=call.message.chat.id, message_id=call.message.message_id - 1)
 
-@bot.message_handler(regexp='!add')
+@bot.message_handler(commands=['add'])
 def triggers(msg):
     if not msg.chat.id == GROUP_ID:
         bot.send_message(msg.chat.id, text.notmafia.format(msg.from_user.id),
@@ -254,8 +254,10 @@ def triggers(msg):
                 time.sleep(3)
                 bot.delete_message(msg.chat.id, msg.message_id)
                 bot.delete_message(msg.chat.id, msg_delete.message_id)
+        else:
+            bot.send_message(msg.chat.id, text.actonlyadm)
 
-@bot.message_handler(regexp='!del')
+@bot.message_handler(commands=['del'])
 def triggers(msg):
     if not msg.chat.id == GROUP_ID:
         bot.send_message(msg.chat.id, text.notmafia)
@@ -267,6 +269,30 @@ def triggers(msg):
             if uid in uids:
                 msg_delete = bot.send_message(msg.chat.id, text.delact)
                 cur.execute('DELETE FROM active WHERE uids = %s', [uid])
+                conn.commit()
+                uids.remove(uid)
+                time.sleep(3)
+                bot.delete_message(msg.chat.id, msg.message_id)
+                bot.delete_message(msg.chat.id, msg_delete.message_id)
+            else:
+                msg_delete = bot.send_message(msg.chat.id, text.delact)
+                time.sleep(3)
+                bot.delete_message(msg.chat.id, msg.message_id)
+                bot.delete_message(msg.chat.id, msg_delete.message_id)
+        else:
+            bot.send_message(msg.chat.id, text.actonlyadm)
+
+@bot.message_handler(commands=['del2'])
+def triggers(msg):
+    if not msg.chat.id == GROUP_ID:
+        bot.send_message(msg.chat.id, text.notmafia)
+    else:
+        admins = [admin.user.id for admin in bot.get_chat_administrators(GROUP_ID)]
+        if msg.from_user.id in admins:
+            uid = msg.reply_to_message.from_user.id
+            print(uid)
+            if uid in all_uids:
+                msg_delete = bot.send_message(msg.chat.id, text.delact)
                 cur.execute('DELETE FROM all_uids WHERE list = %s', [uid])
                 conn.commit()
                 uids.remove(uid)
@@ -278,6 +304,8 @@ def triggers(msg):
                 time.sleep(3)
                 bot.delete_message(msg.chat.id, msg.message_id)
                 bot.delete_message(msg.chat.id, msg_delete.message_id)
+        else:
+            bot.send_message(msg.chat.id, text.actonlyadm)
 
 #
 # kick ban COMBOT
@@ -290,7 +318,7 @@ def triggers(msg):
         next_game_message = bot.send_message(msg.chat.id, text.nextgame, parse_mode="HTML")
         bot.pin_chat_message(msg.chat.id, next_game_message.message_id)
     else:
-        print('Not admin')
+        bot.send_message(msg.chat.id, text.actonlyadm)
 
 
 @bot.message_handler(regexp='!ban')
