@@ -260,11 +260,13 @@ def triggers(msg):
         if msg.from_user.id in admins:
             uid = msg.reply_to_message.from_user.id
             print(uid)
-            if uid in uids:
+            if uid in all_uids:
                 msg_delete = bot.send_message(msg.chat.id, text.delact)
-                cur.execute('DELETE FROM active WHERE uids = %s', [uid])
+                cur.execute('DELETE FROM all_uids WHERE list = %s', [uid])
+                if uid in uids:
+                    cur.execute('DELETE FROM active WHERE uids = %s', [uid])
+                    uids.remove(uid)
                 conn.commit()
-                uids.remove(uid)
                 time.sleep(3)
                 bot.delete_message(msg.chat.id, msg.message_id)
                 bot.delete_message(msg.chat.id, msg_delete.message_id)
@@ -288,9 +290,9 @@ def triggers(msg):
         if msg.from_user.id in admins:
             uid = msg.reply_to_message.from_user.id
             print(uid)
-            if uid in all_uids:
+            if uid in uids:
                 msg_delete = bot.send_message(msg.chat.id, text.delact)
-                cur.execute('DELETE FROM all_uids WHERE list = %s', [uid])
+                cur.execute('DELETE FROM active WHERE uids = %s', [uid])
                 conn.commit()
                 uids.remove(uid)
                 time.sleep(3)
