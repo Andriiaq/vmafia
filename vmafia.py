@@ -375,5 +375,7 @@ def triggers(msg):
 #
 # kick ban COMBOT
 
+bot.get_chat_members_count()
+
 
 bot.polling(none_stop=True)
