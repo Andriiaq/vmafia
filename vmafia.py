@@ -4,6 +4,7 @@ import config
 import text
 # Python Add-ons
 import time
+import os
 import psycopg2
 import telebot
 from telebot import types
@@ -12,7 +13,7 @@ from telebot import types
 bot = telebot.TeleBot(config.token)
 
 DATABASE_URL = config.database_url
-conn = psycopg2.connect(DATABASE_URL)
+conn = psycopg2.connect(DATABASE_URL, sslmode='require')
 cur = conn.cursor()
 
 GROUP_ID = config.group_id
@@ -374,8 +375,6 @@ def triggers(msg):
 
 #
 # kick ban COMBOT
-
-bot.get_chat_members_count()
 
 
 bot.polling(none_stop=True)
