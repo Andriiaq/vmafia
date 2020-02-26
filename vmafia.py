@@ -25,9 +25,11 @@ GROUP_ID = config.group_id
 # Команди
 
 def job():
-    bot.send_message(GROUP_ID, text.nextgame, parse_mode="HTML")
+    next_game_message = bot.send_message(GROUP_ID, text.nextgame, parse_mode="HTML")
+    bot.pin_chat_message(GROUP_ID, next_game_message.message_id)
 
-schedule.every().day.at("06:12").do(job)
+schedule.every().day.at("05:00").do(job)
+# schedule.every(1).minutes.do(job)
 
 def go():
     while 1:
