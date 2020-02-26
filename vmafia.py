@@ -233,8 +233,7 @@ def active(msg):
         bot.send_message(msg.chat.id, text.notmafia.format(msg.from_user.id, msg.from_user.first_name),
                          parse_mode="HTML")
     else:
-        active_users = [active_user.user.id for active_user in bot.get_chat_member(GROUP_ID_ACTIVE)]
-        if msg.from_user.id in active_users:
+        if bot.get_chat_member(GROUP_ID_ACTIVE, msg.from_user.id).status == 'member':
             temp_uids.clear()
             bot.send_message(msg.chat.id, text=text.actext1, parse_mode='html')
             keyboard = types.InlineKeyboardMarkup()
