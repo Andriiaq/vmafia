@@ -24,19 +24,72 @@ GROUP_ID = config.group_id
 #
 # Команди
 
+@bot.message_handler(commands=['1'])
+def triggers(msg):
+    admins = [admin.user.id for admin in bot.get_chat_administrators(GROUP_ID)]
+    if msg.from_user.id in admins:
+        bot.delete_message(msg.chat.id, msg.message_id)
+        type_name = 'good_morning'
+        cur.execute("SELECT id FROM messages WHERE type = %s", [type_name])
+        good_morning_value = cur.fetchone()
+        if 1 in good_morning_value:
+            next_game_message = bot.send_message(GROUP_ID, text.good_morning_1, parse_mode="HTML")
+            bot.pin_chat_message(GROUP_ID, next_game_message.message_id)
+        elif 0 in good_morning_value:
+            next_game_message = bot.send_message(GROUP_ID, text.good_morning_0, parse_mode="HTML")
+            bot.pin_chat_message(GROUP_ID, next_game_message.message_id)
+    else:
+        bot.delete_message(msg.chat.id, msg.message_id)
+        delete_send_message = bot.send_message(msg.chat.id, text=text.onlyadm.format(msg.from_user.id), parse_mode="HTML")
+        time.sleep(5)
+        bot.delete_message(msg.chat.id, delete_send_message.message_id)
+
+@bot.message_handler(commands=['2'])
+def triggers(msg):
+    admins = [admin.user.id for admin in bot.get_chat_administrators(GROUP_ID)]
+    if msg.from_user.id in admins:
+        bot.delete_message(msg.chat.id, msg.message_id)
+        type_name = 'good_morning'
+        cur.execute("SELECT id FROM messages WHERE type = %s", [type_name])
+        good_morning_value = cur.fetchone()
+        if 1 in good_morning_value:
+            cur.execute("UPDATE messages SET id = %s WHERE type = %s", [0, type_name])
+            delete_send_message = bot.send_message(msg.chat.id, text=text.good_morning_change_0, parse_mode="HTML")
+            time.sleep(5)
+            bot.delete_message(msg.chat.id, delete_send_message.message_id)
+        elif 0 in good_morning_value or None in good_morning_value:
+            cur.execute("UPDATE messages SET id = %s WHERE type = %s", [1, type_name])
+            delete_send_message = bot.send_message(msg.chat.id, text=text.good_morning_change_1, parse_mode="HTML")
+            time.sleep(5)
+            bot.delete_message(msg.chat.id, delete_send_message.message_id)
+        conn.commit()
+    else:
+        bot.delete_message(msg.chat.id, msg.message_id)
+        delete_send_message = bot.send_message(msg.chat.id, text=text.onlyadm.format(msg.from_user.id), parse_mode="HTML")
+        time.sleep(5)
+        bot.delete_message(msg.chat.id, delete_send_message.message_id)
+
+
 def job():
-    next_game_message = bot.send_message(GROUP_ID, text.nextgame, parse_mode="HTML")
-    bot.pin_chat_message(GROUP_ID, next_game_message.message_id)
+    type_name = 'good_morning'
+    cur.execute("SELECT id FROM messages WHERE type = %s", [type_name])
+    good_morning_value = cur.fetchone()
+    if 1 in good_morning_value:
+        next_game_message = bot.send_message(GROUP_ID, text.good_morning_1, parse_mode="HTML")
+        bot.pin_chat_message(GROUP_ID, next_game_message.message_id)
+    elif 0 in good_morning_value:
+        next_game_message = bot.send_message(GROUP_ID, text.good_morning_0, parse_mode="HTML")
+        bot.pin_chat_message(GROUP_ID, next_game_message.message_id)
 
 schedule.every().day.at("05:00").do(job)
-# schedule.every(1).minutes.do(job)
+# schedule.every(10).seconds.do(job)
 
 def go():
     while 1:
         schedule.run_pending()
         time.sleep(1)
 
-t = threading.Thread(target=go, name="тест")
+t = threading.Thread(target=go, name="test")
 t.start()
 
 @bot.message_handler(regexp='!testall')
@@ -71,16 +124,17 @@ def triggers(msg):
     keyboard = types.InlineKeyboardMarkup()
     url_button = types.InlineKeyboardButton(text='Читати правила', url='https://t.me/mafia_pravyla')
     keyboard.add(url_button)
-    msgbotdel = bot.send_message(cid, text=text.guide, parse_mode='HTML', reply_markup=keyboard)
+    send_message = bot.send_message(cid, text=text.guide, parse_mode='HTML', reply_markup=keyboard)
+    new_bot_message_id = send_message.message_id
+    type_name = 'guide'
     ##### Вибрати та видалити id повідомлення
-    cur.execute("SELECT msg3 FROM delmsg")
-    delid = cur.fetchone()
-    if not None in delid:
-        try:
-            bot.delete_message(msg.chat.id, delid)
-        except Exception:
-            cur.execute("UPDATE delmsg SET msg3 = NULL")
-    cur.execute("UPDATE delmsg SET msg3 = %s", [msgbotdel.message_id])
+    cur.execute("SELECT id FROM messages WHERE type = %s", [type_name])
+    old_bot_message_id = cur.fetchone()
+    try:
+        bot.delete_message(msg.chat.id, old_bot_message_id)
+    except Exception:
+        pass
+    cur.execute("UPDATE messages SET id = %s WHERE type = %s", [new_bot_message_id, type_name])
     conn.commit()
     ##### Зберегти id поста
 
@@ -116,22 +170,23 @@ def triggers(msg):
             keyboard = types.InlineKeyboardMarkup()
             url_button = types.InlineKeyboardButton(text="Читати правила", url="https://t.me/mafia_pravyla")
             keyboard.add(url_button)
-            msgbotdel = bot.send_message(msg.chat.id,
+            send_message = bot.send_message(msg.chat.id,
                                          text=text.hello.format(uid, msg.new_chat_member.first_name),
                                          parse_mode="HTML", reply_markup=keyboard)
             if not uid in uids:
                 cur.execute("INSERT INTO active (uids) VALUES (%s)", [uid])
                 cur.execute("INSERT INTO all_uids (list) VALUES (%s)", [uid])
                 uids.append(uid)
+            new_bot_message_id = send_message.message_id
+            type_name = 'new_chat_member'
             ##### Вибрати та видалити id повідомлення
-            cur.execute("SELECT msg2 FROM delmsg")
-            delid = cur.fetchone()
-            if not None in delid:
-                try:
-                    bot.delete_message(msg.chat.id, delid)
-                except Exception:
-                    cur.execute("UPDATE delmsg SET msg2 = NULL")
-            cur.execute("UPDATE delmsg SET msg2 = %s", [msgbotdel.message_id])
+            cur.execute("SELECT id FROM messages WHERE type = %s", [type_name])
+            old_bot_message_id = cur.fetchone()
+            try:
+                bot.delete_message(msg.chat.id, old_bot_message_id)
+            except Exception:
+                pass
+            cur.execute("UPDATE messages SET id = %s WHERE type = %s", [new_bot_message_id, type_name])
             conn.commit()
             ##### Зберегти id поста
 
@@ -328,19 +383,6 @@ def triggers(msg):
 
 #
 # kick ban COMBOT
-
-@bot.message_handler(commands=['1'])
-def triggers(msg):
-    admins = [admin.user.id for admin in bot.get_chat_administrators(GROUP_ID)]
-    if msg.from_user.id in admins:
-        bot.delete_message(msg.chat.id, msg.message_id)
-        next_game_message = bot.send_message(msg.chat.id, text.nextgame, parse_mode="HTML")
-        bot.pin_chat_message(msg.chat.id, next_game_message.message_id)
-    else:
-        msg_delete = bot.send_message(msg.chat.id, text=text.onlyadm.format(msg.from_user.id), parse_mode="HTML")
-        time.sleep(5)
-        bot.delete_message(msg.chat.id, msg.message_id)
-        bot.delete_message(msg.chat.id, msg_delete.message_id)
 
 
 @bot.message_handler(regexp='!ban')
