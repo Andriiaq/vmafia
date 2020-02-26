@@ -38,7 +38,7 @@ def subscribe_chat(msg):
 
 @bot.message_handler(func=lambda message: step.get(true) == 1)
 def add_user_active(msg):
-    if not bot.get_chat_member(GROUP_ID_ACTIVE, msg.from_user.id).status == 'left':
+    if msg.chat.id == GROUP_ID_ACTIVE:
         bot.send_message(GROUP_ID, msg.text, parse_mode="HTML")
         step[true] = 0
     else:
