@@ -69,7 +69,7 @@ def triggers(msg):
         time.sleep(5)
         bot.delete_message(msg.chat.id, delete_send_message.message_id)
 
-@bot.message_handler(commands=['on_off_gm'])
+@bot.message_handler(commands=['set_gm'])
 def triggers(msg):
     admins = [admin.user.id for admin in bot.get_chat_administrators(GROUP_ID)]
     if msg.from_user.id in admins:
