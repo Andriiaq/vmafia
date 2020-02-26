@@ -106,9 +106,7 @@ def triggers(msg):
 
 
 def job():
-    if not msg.chat.id == GROUP_ID:
-        pass
-    else:
+    if msg.chat.id == GROUP_ID:
         type_name = 'good_morning'
         type_name2 = 'good_morning_on_off'
         cur.execute("SELECT id FROM messages WHERE type = %s", [type_name])
@@ -124,6 +122,8 @@ def job():
                 bot.pin_chat_message(GROUP_ID, next_game_message.message_id)
         else:
             pass
+    else:
+        pass
 
 schedule.every().day.at("05:00").do(job)
 # schedule.every(5).seconds.do(job)
@@ -405,7 +405,6 @@ def triggers(msg):
         admins = [admin.user.id for admin in bot.get_chat_administrators(GROUP_ID)]
         if msg.from_user.id in admins:
             uid = msg.reply_to_message.from_user.id
-            print(uid)
             if uid in uids:
                 msg_delete = bot.send_message(msg.chat.id, text.delact)
                 cur.execute('DELETE FROM active WHERE uids = %s', [uid])
