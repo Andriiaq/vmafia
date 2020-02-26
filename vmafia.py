@@ -186,6 +186,8 @@ def triggers(msg):
     if not msg.chat.id == GROUP_ID:
         bot.send_message(msg.chat.id, text.notmafia.format(msg.from_user.id, msg.from_user.first_name),
                          parse_mode="HTML")
+    elif msg.chat.id == GROUP_ID_ACTIVE:
+        pass
     else:
         if not msg.new_chat_member.is_bot == True:
             uid = msg.new_chat_member.id
@@ -218,6 +220,8 @@ def triggers(msg):
     if not msg.chat.id == GROUP_ID:
         bot.send_message(msg.chat.id, text.notmafia.format(msg.from_user.id, msg.from_user.first_name),
                          parse_mode="HTML")
+    elif msg.chat.id == GROUP_ID_ACTIVE:
+        pass
     else:
         uid = msg.left_chat_member.id
         if uid in uids:
@@ -261,7 +265,7 @@ def active(msg):
                 bot.send_message(msg.chat.id, text=text.actext2, parse_mode='html')
             bot.send_message(msg.chat.id, text=text.actext3, reply_markup=keyboard, parse_mode='html')
         else:
-            msg_delete = bot.send_message(msg.chat.id, text=text.actonlyadm.format(msg.from_user.id), parse_mode="HTML")
+            msg_delete = bot.send_message(msg.chat.id, text=text.onlyact.format(msg.from_user.id), parse_mode="HTML")
             time.sleep(5)
             bot.delete_message(msg.chat.id, msg.message_id)
             bot.delete_message(msg.chat.id, msg_delete.message_id)
@@ -269,7 +273,7 @@ def active(msg):
 
 @bot.callback_query_handler(func=lambda c: True)
 def active(call):
-    if not msg.chat.id == GROUP_ID:
+    if not call.chat.id == GROUP_ID:
         pass
     else:
         uid = call.from_user.id
