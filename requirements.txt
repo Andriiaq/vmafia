@@ -1,3 +1,4 @@
 psycopg2==2.8.3
 pyTelegramBotAPI==3.6.1
 python-telegram-bot==7.0.1
+schedule==0.6.0
