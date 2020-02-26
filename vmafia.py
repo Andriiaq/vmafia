@@ -25,10 +25,6 @@ GROUP_ID_ACTIVE = config.group_id_active
 #
 # Команди
 
-@bot.message_handler(commands=['5'])
-def ch(msg):
-    print(bot.get_chat_member(GROUP_ID_ACTIVE, msg.from_user.id))
-
 step = {}
 true = ""
 
@@ -42,8 +38,11 @@ def subscribe_chat(msg):
 
 @bot.message_handler(func=lambda message: step.get(true) == 1)
 def add_user_active(msg):
-    bot.send_message(GROUP_ID, msg.text, parse_mode="HTML")
-    step[true] = 0
+    if not bot.get_chat_member(GROUP_ID_ACTIVE, msg.from_user.id).status == 'left':
+        bot.send_message(GROUP_ID, msg.text, parse_mode="HTML")
+        step[true] = 0
+    else:
+        pass
 
 @bot.message_handler(commands=['gm'])
 def triggers(msg):
