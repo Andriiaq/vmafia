@@ -5,7 +5,6 @@ import text
 # Python Add-ons
 import schedule
 import time
-import threading
 
 import psycopg2
 import telebot
