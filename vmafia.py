@@ -27,7 +27,7 @@ GROUP_ID = config.group_id
 def job():
     bot.send_message(GROUP_ID, text.nextgame, parse_mode="HTML")
 
-schedule.every().day.at("08:05").do(job)
+schedule.every().day.at("04:11").do(job)
 
 def go():
     while 1:
