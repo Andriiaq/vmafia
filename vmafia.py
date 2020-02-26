@@ -3,9 +3,7 @@
 import config
 import text
 # Python Add-ons
-import schedule
 import time
-import threading
 
 import psycopg2
 import telebot
@@ -23,19 +21,6 @@ GROUP_ID = config.group_id
 #
 #
 # Команди
-
-def job():
-    bot.send_message(GROUP_ID, text.nextgame, parse_mode="HTML")
-
-schedule.every(1).minutes.do(job)
-
-def go():
-    while 1:
-        schedule.run_pending()
-        time.sleep(1)
-
-t = threading.Thread(target=go, name="тест")
-t.start()
 
 @bot.message_handler(regexp='!testall')
 def triggers(msg):
@@ -390,4 +375,4 @@ def triggers(msg):
 #
 # kick ban COMBOT
 
-bot.polling(none_stop=True, interval=0)
+bot.polling(none_stop=True)
