@@ -30,7 +30,7 @@ true = ""
 
 @bot.message_handler(commands=['text'])
 def subscribe_chat(msg):
-    if not bot.get_chat_member(GROUP_ID_ACTIVE, msg.from_user.id).status == 'left':
+    if msg.chat.id == GROUP_ID_ACTIVE:
         bot.send_message(GROUP_ID_ACTIVE, "Напиши повідомлення, яке хочеш відправити у чат.😁", parse_mode="HTML")
         step[true] = 1
     else:
