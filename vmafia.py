@@ -74,7 +74,7 @@ def triggers(msg):
         good_morning_value = cur.fetchone()
         if 1 in good_morning_value:
             cur.execute("UPDATE messages SET id = %s WHERE type = %s", [0, type_name])
-             bot.send_message(msg.chat.id, text=text.good_morning_off, parse_mode="HTML")
+            bot.send_message(msg.chat.id, text=text.good_morning_off, parse_mode="HTML")
         elif 0 in good_morning_value or None in good_morning_value:
             cur.execute("UPDATE messages SET id = %s WHERE type = %s", [1, type_name])
             bot.send_message(msg.chat.id, text=text.good_morning_on, parse_mode="HTML")
