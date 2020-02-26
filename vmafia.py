@@ -24,7 +24,7 @@ GROUP_ID = config.group_id
 #
 # Команди
 
-@bot.message_handler(commands=['1'])
+@bot.message_handler(commands=['gm'])
 def triggers(msg):
     admins = [admin.user.id for admin in bot.get_chat_administrators(GROUP_ID)]
     if msg.from_user.id in admins:
@@ -44,7 +44,7 @@ def triggers(msg):
         time.sleep(5)
         bot.delete_message(msg.chat.id, delete_send_message.message_id)
 
-@bot.message_handler(commands=['2'])
+@bot.message_handler(commands=['change_gm'])
 def triggers(msg):
     admins = [admin.user.id for admin in bot.get_chat_administrators(GROUP_ID)]
     if msg.from_user.id in admins:
@@ -69,20 +69,51 @@ def triggers(msg):
         time.sleep(5)
         bot.delete_message(msg.chat.id, delete_send_message.message_id)
 
+@bot.message_handler(commands=['on_off_gm'])
+def triggers(msg):
+    admins = [admin.user.id for admin in bot.get_chat_administrators(GROUP_ID)]
+    if msg.from_user.id in admins:
+        bot.delete_message(msg.chat.id, msg.message_id)
+        type_name = 'good_morning_on_off'
+        cur.execute("SELECT id FROM messages WHERE type = %s", [type_name])
+        good_morning_value = cur.fetchone()
+        if 1 in good_morning_value:
+            cur.execute("UPDATE messages SET id = %s WHERE type = %s", [0, type_name])
+            delete_send_message = bot.send_message(msg.chat.id, text=text.good_morning_off, parse_mode="HTML")
+            time.sleep(5)
+            bot.delete_message(msg.chat.id, delete_send_message.message_id)
+        elif 0 in good_morning_value or None in good_morning_value:
+            cur.execute("UPDATE messages SET id = %s WHERE type = %s", [1, type_name])
+            delete_send_message = bot.send_message(msg.chat.id, text=text.good_morning_on, parse_mode="HTML")
+            time.sleep(5)
+            bot.delete_message(msg.chat.id, delete_send_message.message_id)
+        conn.commit()
+    else:
+        bot.delete_message(msg.chat.id, msg.message_id)
+        delete_send_message = bot.send_message(msg.chat.id, text=text.onlyadm.format(msg.from_user.id), parse_mode="HTML")
+        time.sleep(5)
+        bot.delete_message(msg.chat.id, delete_send_message.message_id)
+
 
 def job():
     type_name = 'good_morning'
+    type_name2 = 'good_morning_on_off'
     cur.execute("SELECT id FROM messages WHERE type = %s", [type_name])
-    good_morning_value = cur.fetchone()
-    if 1 in good_morning_value:
-        next_game_message = bot.send_message(GROUP_ID, text.good_morning_1, parse_mode="HTML")
-        bot.pin_chat_message(GROUP_ID, next_game_message.message_id)
-    elif 0 in good_morning_value:
-        next_game_message = bot.send_message(GROUP_ID, text.good_morning_0, parse_mode="HTML")
-        bot.pin_chat_message(GROUP_ID, next_game_message.message_id)
+    good_morning_value1 = cur.fetchone()
+    cur.execute("SELECT id FROM messages WHERE type = %s", [type_name2])
+    good_morning_value2 = cur.fetchone()
+    if 1 in good_morning_value2:
+        if 1 in good_morning_value1:
+            next_game_message = bot.send_message(GROUP_ID, text.good_morning_1, parse_mode="HTML")
+            bot.pin_chat_message(GROUP_ID, next_game_message.message_id)
+        elif 0 in good_morning_value1:
+            next_game_message = bot.send_message(GROUP_ID, text.good_morning_0, parse_mode="HTML")
+            bot.pin_chat_message(GROUP_ID, next_game_message.message_id)
+    else:
+        pass
 
 schedule.every().day.at("05:00").do(job)
-# schedule.every(10).seconds.do(job)
+# schedule.every(5).seconds.do(job)
 
 def go():
     while 1:
