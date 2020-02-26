@@ -293,9 +293,6 @@ def active(msg):
 
 @bot.callback_query_handler(func=lambda c: True)
 def active(call):
-    if not call.chat.id == GROUP_ID:
-        pass
-    else:
         uid = call.from_user.id
         temp_uid = call.from_user.id
         link = ""
