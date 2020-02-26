@@ -130,7 +130,7 @@ def triggers(msg):
         if link:
             bot.send_message(msg.chat.id, link[:-2], parse_mode='html')
 
-@bot.message_handler(regexp='!addall')
+@bot.message_handler(commands=['add_all'])
 def triggers(msg):
     admins = [admin.user.id for admin in bot.get_chat_administrators(GROUP_ID)]
     if msg.from_user.id in admins:
