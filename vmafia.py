@@ -25,6 +25,26 @@ GROUP_ID_ACTIVE = config.group_id_active
 #
 # Команди
 
+@bot.message_handler(commands=['5'])
+def ch(msg):
+    print(bot.get_chat_member(GROUP_ID_ACTIVE, msg.from_user.id))
+
+step = {}
+true = ""
+
+@bot.message_handler(commands=['text'])
+def subscribe_chat(msg):
+    if not bot.get_chat_member(GROUP_ID_ACTIVE, msg.from_user.id).status == 'left':
+        bot.send_message(GROUP_ID_ACTIVE, "Напиши повідомлення, яке хочеш відправити у чат.😁", parse_mode="HTML")
+        step[true] = 1
+    else:
+        pass
+
+@bot.message_handler(func=lambda message: step.get(true) == 1)
+def add_user_active(msg):
+    bot.send_message(GROUP_ID, msg.text, parse_mode="HTML")
+    step[true] = 0
+
 @bot.message_handler(commands=['gm'])
 def triggers(msg):
     admins = [admin.user.id for admin in bot.get_chat_administrators(GROUP_ID)]
@@ -237,7 +257,7 @@ def active(msg):
         bot.send_message(msg.chat.id, text.notmafia.format(msg.from_user.id, msg.from_user.first_name),
                          parse_mode="HTML")
     else:
-        if bot.get_chat_member(GROUP_ID_ACTIVE, msg.from_user.id).status == 'member':
+        if not bot.get_chat_member(GROUP_ID_ACTIVE, msg.from_user.id).status == 'left':
             temp_uids.clear()
             bot.send_message(msg.chat.id, text=text.actext1, parse_mode='html')
             keyboard = types.InlineKeyboardMarkup()
