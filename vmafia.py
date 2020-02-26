@@ -3,8 +3,10 @@
 import config
 import text
 # Python Add-ons
+import schedule
 import time
-import os
+import threading
+
 import psycopg2
 import telebot
 from telebot import types
@@ -13,7 +15,7 @@ from telebot import types
 bot = telebot.TeleBot(config.token)
 
 DATABASE_URL = config.database_url
-conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+conn = psycopg2.connect(DATABASE_URL)
 cur = conn.cursor()
 
 GROUP_ID = config.group_id
@@ -22,6 +24,19 @@ GROUP_ID = config.group_id
 #
 # Команди
 
+def job():
+    print("I'm working...")
+    bot.send_message(GROUP_ID, text.nextgame, parse_mode="HTML")
+
+schedule.every().day.at("07:30").do(job)
+
+def go():
+    while 1:
+        schedule.run_pending()
+        time.sleep(1)
+
+t = threading.Thread(target=go, name="тест")
+t.start()
 
 @bot.message_handler(regexp='!testall')
 def triggers(msg):
@@ -376,5 +391,5 @@ def triggers(msg):
 #
 # kick ban COMBOT
 
-
-bot.polling(none_stop=True)
+if __name__ == '__main__':
+    bot.polling(none_stop=True, interval=0)
