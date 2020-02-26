@@ -24,19 +24,6 @@ GROUP_ID = config.group_id
 #
 # Команди
 
-def job():
-    bot.send_message(GROUP_ID, text.nextgame, parse_mode="HTML")
-
-schedule.every(1).minutes.do(job)
-
-def go():
-    while 1:
-        schedule.run_pending()
-        time.sleep(1)
-
-t = threading.Thread(target=go, name="тест")
-t.start()
-
 @bot.message_handler(regexp='!testall')
 def triggers(msg):
     admins = [admin.user.id for admin in bot.get_chat_administrators(GROUP_ID)]
