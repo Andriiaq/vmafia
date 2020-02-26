@@ -390,4 +390,4 @@ def triggers(msg):
 #
 # kick ban COMBOT
 
-bot.polling(none_stop=True)
+bot.polling(none_stop=True, interval=0)
