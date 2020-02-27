@@ -28,12 +28,13 @@ GROUP_ID_ACTIVE = config.group_id_active
 temp_uids = []
 cur.execute("SELECT uids FROM active")
 uids = [a[0] for a in cur.fetchall()]
-cur.execute("SELECT uids_admins FROM active_admins")
-uids_admins = [a[0] for a in cur.fetchall()]
-print(uids_admins)
 
 cur.execute("SELECT list FROM all_uids")
-list_uids = [b[0] for b in cur.fetchall()]
+all_uids = [b[0] for b in cur.fetchall()]
+
+cur.execute("SELECT uids_admins FROM active_admins")
+uids_admins = [a[0] for a in cur.fetchall()]
+
 conn.commit()
 print(text.test_bot)
 
@@ -304,8 +305,8 @@ def triggers(msg):
 @bot.message_handler(content_types=["left_chat_member"])
 def triggers(msg):
     if msg.chat.id == GROUP_ID:
+        uid = msg.left_chat_member.id
         if uid in uids:
-            uid = msg.left_chat_member.id
             cur.execute('DELETE FROM active WHERE uids = %s', [uid])
             cur.execute('DELETE FROM all_uids WHERE list = %s', [uid])
             conn.commit()
