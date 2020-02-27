@@ -105,27 +105,24 @@ def triggers(msg):
         bot.delete_message(msg.chat.id, delete_send_message.message_id)
 
 
-def job():
-    if msg.chat.id == GROUP_ID:
-        type_name = 'good_morning'
-        type_name2 = 'good_morning_on_off'
-        cur.execute("SELECT id FROM messages WHERE type = %s", [type_name])
-        good_morning_value1 = cur.fetchone()
-        cur.execute("SELECT id FROM messages WHERE type = %s", [type_name2])
-        good_morning_value2 = cur.fetchone()
-        if 1 in good_morning_value2:
-            if 1 in good_morning_value1:
-                next_game_message = bot.send_message(GROUP_ID, text.good_morning_1, parse_mode="HTML")
-                bot.pin_chat_message(GROUP_ID, next_game_message.message_id)
-            elif 0 in good_morning_value1:
-                next_game_message = bot.send_message(GROUP_ID, text.good_morning_0, parse_mode="HTML")
-                bot.pin_chat_message(GROUP_ID, next_game_message.message_id)
-        else:
-            pass
+def job(msg):
+    type_name = 'good_morning'
+    type_name2 = 'good_morning_on_off'
+    cur.execute("SELECT id FROM messages WHERE type = %s", [type_name])
+    good_morning_value1 = cur.fetchone()
+    cur.execute("SELECT id FROM messages WHERE type = %s", [type_name2])
+    good_morning_value2 = cur.fetchone()
+    if 1 in good_morning_value2:
+        if 1 in good_morning_value1:
+            next_game_message = bot.send_message(GROUP_ID, text.good_morning_1, parse_mode="HTML")
+            bot.pin_chat_message(GROUP_ID, next_game_message.message_id)
+        elif 0 in good_morning_value1:
+            next_game_message = bot.send_message(GROUP_ID, text.good_morning_0, parse_mode="HTML")
+            bot.pin_chat_message(GROUP_ID, next_game_message.message_id)
     else:
         pass
 
-schedule.every().day.at("05:00").do(job)
+schedule.every().day.at("05:10").do(job)
 # schedule.every(5).seconds.do(job)
 
 def go():
