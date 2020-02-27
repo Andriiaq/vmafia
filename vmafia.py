@@ -348,7 +348,7 @@ def triggers(msg):
 step = {}
 true = ""
 
-@bot.message_handler(regexp='!чат')
+@bot.message_handler(commands=['чат'])
 def subscribe_chat(msg):
     if msg.chat.id == GROUP_ID_ACTIVE:
         bot.send_message(GROUP_ID_ACTIVE, "Напиши повідомлення, яке хочеш відправити у чат від імені бота.😁", parse_mode="HTML")
@@ -365,7 +365,7 @@ def add_user_active(msg):
         type_name = 'text_user_id'
         cur.execute("SELECT id FROM messages WHERE type = %s", [type_name])
         text_user_id = cur.fetchone()
-        if msg.from_user.id in text_user_id and not msg.text == 'стоп':
+        if msg.from_user.id in text_user_id and not msg.text == '!стоп':
             print(msg.text)
             bot.send_message(GROUP_ID, msg.text, parse_mode="HTML")
         else:
