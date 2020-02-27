@@ -265,12 +265,7 @@ def triggers(msg):
 
 @bot.message_handler(content_types=["new_chat_members"])
 def triggers(msg):
-    if not msg.chat.id == GROUP_ID:
-        bot.send_message(msg.chat.id, text.notmafia.format(msg.from_user.id, msg.from_user.first_name),
-                         parse_mode="HTML")
-    elif msg.chat.id == GROUP_ID_ACTIVE:
-        pass
-    else:
+    if msg.chat.id == GROUP_ID:
         if not msg.new_chat_member.is_bot == True:
             uid = msg.new_chat_member.id
             keyboard = types.InlineKeyboardMarkup()
@@ -295,22 +290,30 @@ def triggers(msg):
             cur.execute("UPDATE messages SET id = %s WHERE type = %s", [new_bot_message_id, type_name])
             conn.commit()
             ##### Зберегти id поста
+    elif msg.chat.id == GROUP_ID_ACTIVE:
+        uid_admin = msg.new_chat_member.id
+        cur.execute("INSERT INTO active_admins (uids_admins) VALUES (%s)", [uid_admin])
+    else:
+        bot.send_message(msg.chat.id, text.notmafia.format(msg.from_user.id, msg.from_user.first_name),
+                     parse_mode="HTML")
 
 
 @bot.message_handler(content_types=["left_chat_member"])
 def triggers(msg):
-    if not msg.chat.id == GROUP_ID:
-        bot.send_message(msg.chat.id, text.notmafia.format(msg.from_user.id, msg.from_user.first_name),
-                         parse_mode="HTML")
-    elif msg.chat.id == GROUP_ID_ACTIVE:
-        pass
-    else:
-        uid = msg.left_chat_member.id
+    if msg.chat.id == GROUP_ID:
         if uid in uids:
+            uid = msg.left_chat_member.id
             cur.execute('DELETE FROM active WHERE uids = %s', [uid])
             cur.execute('DELETE FROM all_uids WHERE list = %s', [uid])
             conn.commit()
             uids.remove(uid)
+    elif msg.chat.id == GROUP_ID_ACTIVE:
+        uid_admin = msg.left_chat_member.id
+        cur.execute('DELETE FROM active_admins WHERE uids_admins = %s', [uid_admin])
+        conn.commit()
+    else:
+        bot.send_message(msg.chat.id, text.notmafia.format(msg.from_user.id, msg.from_user.first_name),
+                         parse_mode="HTML")
 
 
 #
