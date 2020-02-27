@@ -75,27 +75,16 @@ def active(msg):
             bot.delete_message(msg.chat.id, msg_delete.message_id)
 ### АКТИВ АДМІНСЬКИЙ
     elif msg.chat.id == GROUP_ID_ACTIVE:
-        if not bot.get_chat_member(GROUP_ID_ACTIVE, msg.from_user.id).status == 'left':
-            keyboard = types.InlineKeyboardMarkup()
-            keyboard.row(
-                types.InlineKeyboardButton(text=text.activebtn1, callback_data='text1')
-            )
-            if len(uids) == 0:
-                bot.send_message(msg.chat.id, 'Будь першим')
-            else:
-                i = 0
-                link = ''
-                for uid in uids_admins:
-                    link += '<a href="tg://user?id={id}">{name}</a>, '.format(id=uid,
-                                                                              name=bot.get_chat_member(msg.chat.id,
-                                                                                                                   uid).user.first_name)
-                    i += 1
-                    if i % 5 == 0:
-                        bot.send_message(msg.chat.id, link[:-2], parse_mode='html')
-                        link = ''
-                if link:
+        i = 0
+        link = ''
+        for uid in uids_admins:
+            link += '<a href="tg://user?id={id}">{name}</a>, '.format(id=uid, name=bot.get_chat_member(msg.chat.id, uid).user.first_name)
+                i += 1
+                if i % 5 == 0:
                     bot.send_message(msg.chat.id, link[:-2], parse_mode='html')
-                bot.send_message(msg.chat.id, text='Усі додайтесь в актив!!!', reply_markup=keyboard, parse_mode='html')
+                    link = ''
+            if link:
+                    bot.send_message(msg.chat.id, link[:-2], parse_mode='html')
     else:
         bot.send_message(msg.chat.id, text.notmafia.format(msg.from_user.id, msg.from_user.first_name),
                          parse_mode="HTML")
@@ -142,17 +131,6 @@ def active(call):
                                 name=bot.get_chat_member(call.message.chat.id, temp_uid).user.first_name, id=temp_uid)
                         bot.edit_message_text(text='''Долучились в <b>наступний</b> актив: 
 ''' + link[:-2], parse_mode='HTML', chat_id=call.message.chat.id, message_id=call.message.message_id - 1)
-def active2(call):
-    uid = call.from_user.id
-    temp_uid = call.from_user.id
-    if call.data == 'text1':
-        if uid in uids:
-            bot.answer_callback_query(callback_query_id=call.id, text='Ти вже є у активі.')
-        else:
-            cur.execute("INSERT INTO active_admins (uids_admins) VALUES (%s)", [call.from_user.id])
-            conn.commit()
-            uids.append(uid)
-            bot.answer_callback_query(callback_query_id=call.id, text='Тебе додано в наступний актив.')
 
 #
 #
