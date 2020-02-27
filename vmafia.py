@@ -105,7 +105,7 @@ def triggers(msg):
         bot.delete_message(msg.chat.id, delete_send_message.message_id)
 
 
-def job(msg):
+def job():
     type_name = 'good_morning'
     type_name2 = 'good_morning_on_off'
     cur.execute("SELECT id FROM messages WHERE type = %s", [type_name])
@@ -122,7 +122,7 @@ def job(msg):
     else:
         pass
 
-schedule.every().day.at("05:10").do(job)
+schedule.every().day.at("05:13").do(job)
 # schedule.every(5).seconds.do(job)
 
 def go():
