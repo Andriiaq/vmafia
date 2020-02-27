@@ -79,11 +79,11 @@ def active(msg):
         link = ''
         for uid in uids_admins:
             link += '<a href="tg://user?id={id}">{name}</a>, '.format(id=uid, name=bot.get_chat_member(msg.chat.id, uid).user.first_name)
-                i += 1
-                if i % 5 == 0:
-                    bot.send_message(msg.chat.id, link[:-2], parse_mode='html')
-                    link = ''
-            if link:
+            i += 1
+            if i % 5 == 0:
+                bot.send_message(msg.chat.id, link[:-2], parse_mode='html')
+                link = ''
+        if link:
                     bot.send_message(msg.chat.id, link[:-2], parse_mode='html')
     else:
         bot.send_message(msg.chat.id, text.notmafia.format(msg.from_user.id, msg.from_user.first_name),
