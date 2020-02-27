@@ -30,6 +30,7 @@ cur.execute("SELECT uids FROM active")
 uids = [a[0] for a in cur.fetchall()]
 cur.execute("SELECT uids_admins FROM active_admins")
 uids_admins = [a[0] for a in cur.fetchall()]
+print(uids_admins)
 
 cur.execute("SELECT list FROM all_uids")
 list_uids = [b[0] for b in cur.fetchall()]
@@ -93,7 +94,7 @@ def active(msg):
                         link = ''
                 if link:
                     bot.send_message(msg.chat.id, link[:-2], parse_mode='html')
-                bot.send_message(msg.chat.id, text='Усі додайтесь в актив', reply_markup=keyboard, parse_mode='html')
+                bot.send_message(msg.chat.id, text='Усі додайтесь в актив!!!', reply_markup=keyboard, parse_mode='html')
     else:
         bot.send_message(msg.chat.id, text.notmafia.format(msg.from_user.id, msg.from_user.first_name),
                          parse_mode="HTML")
@@ -293,6 +294,8 @@ def triggers(msg):
     elif msg.chat.id == GROUP_ID_ACTIVE:
         uid_admin = msg.new_chat_member.id
         cur.execute("INSERT INTO active_admins (uids_admins) VALUES (%s)", [uid_admin])
+        conn.commit()
+        uids_admins.append(uid_admin)
     else:
         bot.send_message(msg.chat.id, text.notmafia.format(msg.from_user.id, msg.from_user.first_name),
                      parse_mode="HTML")
@@ -311,6 +314,7 @@ def triggers(msg):
         uid_admin = msg.left_chat_member.id
         cur.execute('DELETE FROM active_admins WHERE uids_admins = %s', [uid_admin])
         conn.commit()
+        uids_admins.remove(uid_admin)
     else:
         bot.send_message(msg.chat.id, text.notmafia.format(msg.from_user.id, msg.from_user.first_name),
                          parse_mode="HTML")
