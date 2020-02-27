@@ -249,8 +249,11 @@ def triggers(msg):
         if msg.chat.id == GROUP_ID:
             uid = msg.new_chat_member.id
             keyboard = types.InlineKeyboardMarkup()
-            url_button = types.InlineKeyboardButton(text="Читати правила", url="https://t.me/mafia_pravyla")
-            keyboard.add(url_button)
+            url_button1 = types.InlineKeyboardButton(text="Правила", url="https://t.me/avmafia/34")
+            url_button2 = types.InlineKeyboardButton(text="Як грати", url="https://t.me/avmafia/5")
+            url_button3 = types.InlineKeyboardButton(text="Інструкція", url="https://t.me/avmafia/2")
+            keyboard.add(url_button1, url_button2)
+            keyboard.add(url_button3)
             send_message = bot.send_message(msg.chat.id,
                                          text=text.hello.format(uid, msg.new_chat_member.first_name),
                                          parse_mode="HTML", reply_markup=keyboard)
@@ -271,8 +274,8 @@ def triggers(msg):
             conn.commit()
             ##### Зберегти id поста
         elif msg.chat.id == GROUP_ID_ACTIVE:
+            uid_admin = msg.new_chat_member.id
             if not uid_admins in uids_admins:
-                uid_admin = msg.new_chat_member.id
                 cur.execute("INSERT INTO active_admins (uids_admins) VALUES (%s)", [uid_admin])
                 conn.commit()
                 uids_admins.append(uid_admin)
