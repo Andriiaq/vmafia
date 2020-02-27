@@ -38,10 +38,7 @@ print(text.test_bot)
 
 @bot.message_handler(commands=['актив', 'active'])
 def active(msg):
-    if not msg.chat.id == GROUP_ID:
-        bot.send_message(msg.chat.id, text.notmafia.format(msg.from_user.id, msg.from_user.first_name),
-                         parse_mode="HTML")
-    else:
+    if msg.chat.id == GROUP_ID:
         if not bot.get_chat_member(GROUP_ID_ACTIVE, msg.from_user.id).status == 'left':
             temp_uids.clear()
             bot.send_message(msg.chat.id, text=text.actext1, parse_mode='html')
@@ -74,14 +71,13 @@ def active(msg):
             time.sleep(5)
             bot.delete_message(msg.chat.id, msg.message_id)
             bot.delete_message(msg.chat.id, msg_delete.message_id)
-
-@bot.message_handler(commands=['актив', 'active'])
-def active2(msg):
-    if not msg.chat.id == GROUP_ID_ACTIVE:
-        bot.send_message(msg.chat.id, text.notmafia.format(msg.from_user.id, msg.from_user.first_name),
-                         parse_mode="HTML")
-    else:
+### АКТИВ АДМІНСЬКИЙ
+    elif msg.chat.id == GROUP_ID_ACTIVE:
         if not bot.get_chat_member(GROUP_ID_ACTIVE, msg.from_user.id).status == 'left':
+            keyboard = types.InlineKeyboardMarkup()
+            keyboard.row(
+                types.InlineKeyboardButton(text=text.activebtn1, callback_data='text1')
+            )
             if len(uids) == 0:
                 bot.send_message(msg.chat.id, 'Будь першим')
             else:
@@ -97,6 +93,10 @@ def active2(msg):
                         link = ''
                 if link:
                     bot.send_message(msg.chat.id, link[:-2], parse_mode='html')
+                bot.send_message(msg.chat.id, text='Усі додайтесь в актив', reply_markup=keyboard, parse_mode='html')
+    else:
+        bot.send_message(msg.chat.id, text.notmafia.format(msg.from_user.id, msg.from_user.first_name),
+                         parse_mode="HTML")
 
 
 @bot.callback_query_handler(func=lambda c: True)
@@ -140,6 +140,17 @@ def active(call):
                                 name=bot.get_chat_member(call.message.chat.id, temp_uid).user.first_name, id=temp_uid)
                         bot.edit_message_text(text='''Долучились в <b>наступний</b> актив: 
 ''' + link[:-2], parse_mode='HTML', chat_id=call.message.chat.id, message_id=call.message.message_id - 1)
+def active2(call):
+    uid = call.from_user.id
+    temp_uid = call.from_user.id
+    if call.data == 'text1':
+        if uid in uids:
+            bot.answer_callback_query(callback_query_id=call.id, text='Ти вже є у активі.')
+        else:
+            cur.execute("INSERT INTO active_admins (uids_admins) VALUES (%s)", [call.from_user.id])
+            conn.commit()
+            uids.append(uid)
+            bot.answer_callback_query(callback_query_id=call.id, text='Тебе додано в наступний актив.')
 
 #
 #
@@ -432,7 +443,7 @@ def triggers(msg):
         time.sleep(5)
         bot.delete_message(msg.chat.id, delete_send_message.message_id)
 
-# Auto Good Morning of 07:00
+# Auto Good Morning of 06:56
 def job():
     type_name = 'good_morning'
     type_name2 = 'good_morning_set'
@@ -450,7 +461,7 @@ def job():
     else:
         pass
 
-schedule.every().day.at("05:21").do(job)
+schedule.every().day.at("04:56").do(job)
 # schedule.every(5).seconds.do(job)
 
 def go():
