@@ -8,7 +8,7 @@ test_bot = '''Bot is working... ahaha
 #
 # Game
 
-next_game = 'Наступна гра о <b>21:00</b>, як і завжди. 🌹'
+next_game = 'Гра о <b>21:00</b>, як завжди. 🌹'
 
 #
 # Good Morning
