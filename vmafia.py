@@ -247,7 +247,9 @@ def triggers(msg):
 def triggers(msg):
     if not msg.new_chat_member.is_bot == True:
         if msg.chat.id == GROUP_ID:
-            bot.pin_chat_message(GROUP_ID, 2)
+            if message_pin is None or not message_pin.message_id == 2:
+                bot.pin_chat_message(GROUP_ID, 2)
+                bot.delete_message(msg.chat.id, msg.message_id + 1)
             uid = msg.new_chat_member.id
             keyboard = types.InlineKeyboardMarkup()
             url_button1 = types.InlineKeyboardButton(text="Правила", url="https://t.me/avmafia/34")
@@ -310,6 +312,22 @@ def triggers(msg):
 #
 #
 # Commands
+
+@bot.message_handler(commands=['print'])
+def triggers(msg):
+    print(bot.get_chat(GROUP_ID).pinned_message.message_id)
+
+
+@bot.message_handler(commands=['pin'])
+def triggers(msg):
+    admins = [admin.user.id for admin in bot.get_chat_administrators(GROUP_ID)]
+    if msg.from_user.id in admins:
+        bot.delete_message(msg.chat.id, msg.message_id)
+        message_pin = bot.get_chat(GROUP_ID).pinned_message
+        if message_pin is None or not message_pin.message_id == 2:
+            bot.pin_chat_message(GROUP_ID, 2)
+            bot.delete_message(msg.chat.id, msg.message_id+1)
+
 
 @bot.message_handler(commands=['гра'])
 def triggers(msg):
