@@ -318,21 +318,31 @@ def triggers(msg):
 
 @bot.message_handler(commands=['print'])
 def triggers(msg):
-    print(bot.get_chat(GROUP_ID).pinned_message.message_id)
+    message_pin = bot.get_chat(GROUP_ID).pinned_message
+    print(message_pin.message_id)
 
 
 @bot.message_handler(commands=['pin'])
 def triggers(msg):
     admins = [admin.user.id for admin in bot.get_chat_administrators(GROUP_ID)]
     if msg.from_user.id in admins:
-        bot.delete_message(msg.chat.id, msg.message_id)
-        bot.pin_chat_message(GROUP_ID, 2)
+        try:
+            bot.delete_message(msg.chat.id, msg.message_id)
+            bot.pin_chat_message(GROUP_ID, 2)
+            delete_send_message = bot.send_message(msg.chat.id, text.pinned_terms, disable_web_page_preview=True, parse_mode='HTML')
+            time.sleep(5)
+            bot.delete_message(msg.chat.id, delete_send_message.message_id)
+        except Exception:
+            delete_send_message = bot.send_message(msg.chat.id, text.not_pinned_terms, disable_web_page_preview=True, parse_mode='HTML')
+            time.sleep(5)
+            bot.delete_message(msg.chat.id, delete_send_message.message_id)
 
 @bot.message_handler(content_types=["pinned_message"])
 def triggers(msg):
     message_pin = bot.get_chat(GROUP_ID).pinned_message
     if message_pin.message_id == 2:
         bot.delete_message(msg.chat.id, msg.message_id)
+
 
 
 @bot.message_handler(commands=['гра'])
