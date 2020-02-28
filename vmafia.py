@@ -252,11 +252,7 @@ def triggers(msg):
 def triggers(msg):
     if not msg.new_chat_member.is_bot == True:
         if msg.chat.id == GROUP_ID:
-            try:
-                bot.pin_chat_message(GROUP_ID, 2)
-                bot.delete_message(msg.chat.id, msg.message_id + 1)
-            except Exception:
-                pass
+            bot.pin_chat_message(GROUP_ID, 2)  # закріпити правила
             uid = msg.new_chat_member.id
             keyboard = types.InlineKeyboardMarkup()
             url_button1 = types.InlineKeyboardButton(text="Правила", url="https://t.me/avmafia/34")
@@ -330,11 +326,13 @@ def triggers(msg):
     admins = [admin.user.id for admin in bot.get_chat_administrators(GROUP_ID)]
     if msg.from_user.id in admins:
         bot.delete_message(msg.chat.id, msg.message_id)
-        try:
-            bot.pin_chat_message(GROUP_ID, 2)
-            bot.delete_message(msg.chat.id, msg.message_id + 1)
-        except Exception:
-            pass
+        bot.pin_chat_message(GROUP_ID, 2)
+
+@bot.message_handler(content_types=["pinned_message"])
+def triggers(msg):
+    message_pin = bot.get_chat(GROUP_ID).pinned_message
+    if message_pin.message_id == 2:
+        bot.delete_message(msg.chat.id, msg.message_id)
 
 
 @bot.message_handler(commands=['гра'])
@@ -483,7 +481,7 @@ def triggers(msg):
         bot.delete_message(msg.chat.id, delete_send_message.message_id)
 
 
-# Auto Good Morning of 06:56
+# Auto Good Morning of 06:56 & pin message of guide
 def job():
     type_name = 'good_morning'
     type_name2 = 'good_morning_set'
@@ -500,24 +498,18 @@ def job():
     else:
         pass
 
-
 def job2():
-    try:
-        bot.pin_chat_message(GROUP_ID, 2)
-        bot.delete_message(msg.chat.id, msg.message_id + 1)
-    except Exception:
-        pass
+    bot.pin_chat_message(GROUP_ID, 2)
 
 schedule.every().day.at("04:56").do(job)
-# schedule.every().day.at("12:06").do(job2)
-# schedule.every(5).seconds.do(job2)
+schedule.every().day.at("10:06").do(job2)
 
+# schedule.every(5).seconds.do(job2)
 
 def go():
     while 1:
         schedule.run_pending()
         time.sleep(1)
-
 
 t = threading.Thread(target=go, name="test")
 t.start()
