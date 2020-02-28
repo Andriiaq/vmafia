@@ -20,7 +20,6 @@ cur = conn.cursor()
 GROUP_ID = config.group_id
 GROUP_ID_ACTIVE = config.group_id_active
 
-
 #
 #
 # Active
@@ -37,6 +36,7 @@ uids_admins = [a[0] for a in cur.fetchall()]
 
 conn.commit()
 print(text.test_bot)
+
 
 @bot.message_handler(commands=['актив', 'active'])
 def active(msg):
@@ -59,7 +59,7 @@ def active(msg):
                 for uid in uids:
                     link += '<a href="tg://user?id={id}">{name}</a>, '.format(id=uid,
                                                                               name=bot.get_chat_member(msg.chat.id,
-                                                                                                                   uid).user.first_name)
+                                                                                                       uid).user.first_name)
                     i += 1
                     if i % 5 == 0:
                         bot.send_message(msg.chat.id, link[:-2], parse_mode='html')
@@ -73,18 +73,19 @@ def active(msg):
             time.sleep(5)
             bot.delete_message(msg.chat.id, msg.message_id)
             bot.delete_message(msg.chat.id, msg_delete.message_id)
-### АКТИВ АДМІНСЬКИЙ
+    ### АКТИВ АДМІНСЬКИЙ
     elif msg.chat.id == GROUP_ID_ACTIVE:
         i = 0
         link = ''
         for uid in uids_admins:
-            link += '<a href="tg://user?id={id}">{name}</a>, '.format(id=uid, name=bot.get_chat_member(msg.chat.id, uid).user.first_name)
+            link += '<a href="tg://user?id={id}">{name}</a>, '.format(id=uid, name=bot.get_chat_member(msg.chat.id,
+                                                                                                       uid).user.first_name)
             i += 1
             if i % 5 == 0:
                 bot.send_message(msg.chat.id, link[:-2], parse_mode='html')
                 link = ''
         if link:
-                    bot.send_message(msg.chat.id, link[:-2], parse_mode='html')
+            bot.send_message(msg.chat.id, link[:-2], parse_mode='html')
     else:
         bot.send_message(msg.chat.id, text.notmafia.format(msg.from_user.id, msg.from_user.first_name),
                          parse_mode="HTML")
@@ -92,45 +93,46 @@ def active(msg):
 
 @bot.callback_query_handler(func=lambda c: True)
 def active(call):
-        uid = call.from_user.id
-        temp_uid = call.from_user.id
-        link = ""
-        if bot.get_chat_member(call.message.chat.id, call.from_user.id).status == 'left':
-            bot.answer_callback_query(callback_query_id=call.id, text='Щоб долучитися, потрібно приєднатися до чату.')
-        else:
-            if call.data == 'text1':
-                if uid in uids:
-                    bot.answer_callback_query(callback_query_id=call.id, text='Ти вже є у активі.')
-                else:
-                    cur.execute("INSERT INTO active (uids) VALUES (%s)", [call.from_user.id])
-                    conn.commit()
-                    uids.append(uid)
-                    bot.answer_callback_query(callback_query_id=call.id, text='Тебе додано в наступний актив.')
-                    temp_uids.append(temp_uid)
+    uid = call.from_user.id
+    temp_uid = call.from_user.id
+    link = ""
+    if bot.get_chat_member(call.message.chat.id, call.from_user.id).status == 'left':
+        bot.answer_callback_query(callback_query_id=call.id, text='Щоб долучитися, потрібно приєднатися до чату.')
+    else:
+        if call.data == 'text1':
+            if uid in uids:
+                bot.answer_callback_query(callback_query_id=call.id, text='Ти вже є у активі.')
+            else:
+                cur.execute("INSERT INTO active (uids) VALUES (%s)", [call.from_user.id])
+                conn.commit()
+                uids.append(uid)
+                bot.answer_callback_query(callback_query_id=call.id, text='Тебе додано в наступний актив.')
+                temp_uids.append(temp_uid)
+                for temp_uid in temp_uids:
+                    link += '<a href="tg://user?id={id}">{name}</a>, '.format(
+                        name=bot.get_chat_member(call.message.chat.id, temp_uid).user.first_name, id=temp_uid)
+                bot.edit_message_text(text='''Долучились в <b>наступний</b> актив:
+''' + link[:-2], parse_mode='HTML', chat_id=call.message.chat.id, message_id=call.message.message_id - 1)
+        elif call.data == 'text2':
+            if len(uids) == 0 or uid not in uids:
+                bot.answer_callback_query(callback_query_id=call.id, text='Тебе немає в наступному активі.')
+            else:
+                cur.execute('DELETE FROM active WHERE uids = %s', [call.from_user.id])
+                conn.commit()
+                uids.remove(uid)
+                bot.answer_callback_query(callback_query_id=call.id, text='Тебе видалено з наступного активу.')
+                if temp_uid in temp_uids:
+                    temp_uids.remove(temp_uid)
+                    if len(temp_uids) == 0:
+                        bot.edit_message_text(text=text.actext2, parse_mode='HTML', chat_id=call.message.chat.id,
+                                              message_id=call.message.message_id - 1)
+                if not len(temp_uids) == 0:
                     for temp_uid in temp_uids:
                         link += '<a href="tg://user?id={id}">{name}</a>, '.format(
                             name=bot.get_chat_member(call.message.chat.id, temp_uid).user.first_name, id=temp_uid)
-                    bot.edit_message_text(text='''Долучились в <b>наступний</b> актив:
+                    bot.edit_message_text(text='''Долучились в <b>наступний</b> актив: 
 ''' + link[:-2], parse_mode='HTML', chat_id=call.message.chat.id, message_id=call.message.message_id - 1)
-            elif call.data == 'text2':
-                if len(uids) == 0 or uid not in uids:
-                    bot.answer_callback_query(callback_query_id=call.id, text='Тебе немає в наступному активі.')
-                else:
-                    cur.execute('DELETE FROM active WHERE uids = %s', [call.from_user.id])
-                    conn.commit()
-                    uids.remove(uid)
-                    bot.answer_callback_query(callback_query_id=call.id, text='Тебе видалено з наступного активу.')
-                    if temp_uid in temp_uids:
-                        temp_uids.remove(temp_uid)
-                        if len(temp_uids) == 0:
-                            bot.edit_message_text(text=text.actext2, parse_mode='HTML', chat_id=call.message.chat.id,
-                                                  message_id=call.message.message_id - 1)
-                    if not len(temp_uids) == 0:
-                        for temp_uid in temp_uids:
-                            link += '<a href="tg://user?id={id}">{name}</a>, '.format(
-                                name=bot.get_chat_member(call.message.chat.id, temp_uid).user.first_name, id=temp_uid)
-                        bot.edit_message_text(text='''Долучились в <b>наступний</b> актив: 
-''' + link[:-2], parse_mode='HTML', chat_id=call.message.chat.id, message_id=call.message.message_id - 1)
+
 
 #
 #
@@ -145,6 +147,7 @@ def triggers(msg):
         cur.execute("INSERT INTO active (uids) SELECT list FROM all_uids")
         conn.commit()
         bot.send_message(msg.chat.id, text.alladdact)
+
 
 @bot.message_handler(commands=['add'])
 def triggers(msg):
@@ -181,6 +184,7 @@ def triggers(msg):
             bot.delete_message(msg.chat.id, msg.message_id)
             bot.delete_message(msg.chat.id, msg_delete.message_id)
 
+
 @bot.message_handler(commands=['del_forever'])
 def triggers(msg):
     if not msg.chat.id == GROUP_ID:
@@ -210,6 +214,7 @@ def triggers(msg):
             time.sleep(5)
             bot.delete_message(msg.chat.id, msg.message_id)
             bot.delete_message(msg.chat.id, msg_delete.message_id)
+
 
 @bot.message_handler(commands=['del'])
 def triggers(msg):
@@ -247,9 +252,11 @@ def triggers(msg):
 def triggers(msg):
     if not msg.new_chat_member.is_bot == True:
         if msg.chat.id == GROUP_ID:
-            if message_pin is None or not message_pin.message_id == 2:
+            try:
                 bot.pin_chat_message(GROUP_ID, 2)
                 bot.delete_message(msg.chat.id, msg.message_id + 1)
+            except Exception:
+                pass
             uid = msg.new_chat_member.id
             keyboard = types.InlineKeyboardMarkup()
             url_button1 = types.InlineKeyboardButton(text="Правила", url="https://t.me/avmafia/34")
@@ -258,15 +265,15 @@ def triggers(msg):
             keyboard.add(url_button1, url_button2)
             keyboard.add(url_button3)
             send_message = bot.send_message(msg.chat.id,
-                                         text=text.hello.format(uid, msg.new_chat_member.first_name),
-                                         parse_mode="HTML", reply_markup=keyboard)
+                                            text=text.hello.format(uid, msg.new_chat_member.first_name),
+                                            parse_mode="HTML", reply_markup=keyboard)
             if not uid in uids:
                 cur.execute("INSERT INTO active (uids) VALUES (%s)", [uid])
                 cur.execute("INSERT INTO all_uids (list) VALUES (%s)", [uid])
                 uids.append(uid)
+            ##### Вибрати та видалити id повідомлення
             new_bot_message_id = send_message.message_id
             type_name = 'new_chat_member'
-            ##### Вибрати та видалити id повідомлення
             cur.execute("SELECT id FROM messages WHERE type = %s", [type_name])
             old_bot_message_id = cur.fetchone()
             try:
@@ -275,7 +282,7 @@ def triggers(msg):
                 pass
             cur.execute("UPDATE messages SET id = %s WHERE type = %s", [new_bot_message_id, type_name])
             conn.commit()
-            ##### Зберегти id поста
+            ##### Вибрати та видалити id повідомлення
         elif msg.chat.id == GROUP_ID_ACTIVE:
             uid_admin = msg.new_chat_member.id
             if not uid_admins in uids_admins:
@@ -284,7 +291,7 @@ def triggers(msg):
                 uids_admins.append(uid_admin)
         else:
             bot.send_message(msg.chat.id, text.notmafia.format(msg.from_user.id, msg.from_user.first_name),
-                         parse_mode="HTML")
+                             parse_mode="HTML")
     else:
         pass
 
@@ -323,10 +330,11 @@ def triggers(msg):
     admins = [admin.user.id for admin in bot.get_chat_administrators(GROUP_ID)]
     if msg.from_user.id in admins:
         bot.delete_message(msg.chat.id, msg.message_id)
-        message_pin = bot.get_chat(GROUP_ID).pinned_message
-        if message_pin is None or not message_pin.message_id == 2:
+        try:
             bot.pin_chat_message(GROUP_ID, 2)
-            bot.delete_message(msg.chat.id, msg.message_id+1)
+            bot.delete_message(msg.chat.id, msg.message_id + 1)
+        except Exception:
+            pass
 
 
 @bot.message_handler(commands=['гра'])
@@ -336,6 +344,7 @@ def triggers(msg):
         bot.delete_message(msg.chat.id, msg.message_id)
         next_game_message = bot.send_message(GROUP_ID, text.next_game, parse_mode="HTML")
         bot.pin_chat_message(GROUP_ID, next_game_message.message_id)
+
 
 @bot.message_handler(commands=['гайд', 'guide'])
 def triggers(msg):
@@ -357,6 +366,7 @@ def triggers(msg):
     conn.commit()
     ##### Зберегти id поста
 
+
 # kick ban COMBOT
 @bot.message_handler(regexp='!ban|!kick|/ban|/kick')
 def triggers(msg):
@@ -374,20 +384,24 @@ def triggers(msg):
                 conn.commit()
                 uids.remove(uid)
 
+
 # Text
 step = {}
 true = ""
 
+
 @bot.message_handler(commands=['чат'])
 def subscribe_chat(msg):
     if msg.chat.id == GROUP_ID_ACTIVE:
-        bot.send_message(GROUP_ID_ACTIVE, "Напиши повідомлення, яке хочеш відправити у чат від імені бота.😁", parse_mode="HTML")
+        bot.send_message(GROUP_ID_ACTIVE, "Напиши повідомлення, яке хочеш відправити у чат від імені бота.😁",
+                         parse_mode="HTML")
         step[true] = 1
         type_name = 'text_user_id'
         cur.execute("UPDATE messages SET id = %s WHERE type = %s", [msg.from_user.id, type_name])
         conn.commit()
     else:
         pass
+
 
 @bot.message_handler(func=lambda message: step.get(true) == 1)
 def add_user_active(msg):
@@ -400,6 +414,7 @@ def add_user_active(msg):
         else:
             bot.send_message(GROUP_ID_ACTIVE, "Відправка повідомлення скасована...😕", parse_mode="HTML")
         step[true] = 0
+
 
 # Good Morning
 @bot.message_handler(commands=['gm'])
@@ -418,9 +433,11 @@ def triggers(msg):
             bot.pin_chat_message(GROUP_ID, next_game_message.message_id)
     else:
         bot.delete_message(msg.chat.id, msg.message_id)
-        delete_send_message = bot.send_message(msg.chat.id, text=text.onlyadm.format(msg.from_user.id), parse_mode="HTML")
+        delete_send_message = bot.send_message(msg.chat.id, text=text.onlyadm.format(msg.from_user.id),
+                                               parse_mode="HTML")
         time.sleep(5)
         bot.delete_message(msg.chat.id, delete_send_message.message_id)
+
 
 @bot.message_handler(regexp='change_gm')
 def triggers(msg):
@@ -438,9 +455,11 @@ def triggers(msg):
         conn.commit()
     else:
         bot.delete_message(msg.chat.id, msg.message_id)
-        delete_send_message = bot.send_message(msg.chat.id, text=text.onlyadm.format(msg.from_user.id), parse_mode="HTML")
+        delete_send_message = bot.send_message(msg.chat.id, text=text.onlyadm.format(msg.from_user.id),
+                                               parse_mode="HTML")
         time.sleep(5)
         bot.delete_message(msg.chat.id, delete_send_message.message_id)
+
 
 @bot.message_handler(regexp='set_gm')
 def triggers(msg):
@@ -458,9 +477,11 @@ def triggers(msg):
         conn.commit()
     else:
         bot.delete_message(msg.chat.id, msg.message_id)
-        delete_send_message = bot.send_message(msg.chat.id, text=text.onlyadm.format(msg.from_user.id), parse_mode="HTML")
+        delete_send_message = bot.send_message(msg.chat.id, text=text.onlyadm.format(msg.from_user.id),
+                                               parse_mode="HTML")
         time.sleep(5)
         bot.delete_message(msg.chat.id, delete_send_message.message_id)
+
 
 # Auto Good Morning of 06:56
 def job():
@@ -476,20 +497,31 @@ def job():
             bot.pin_chat_message(GROUP_ID, next_game_message.message_id)
         elif 0 in good_morning_value1:
             next_game_message = bot.send_message(GROUP_ID, text.good_morning_0, parse_mode="HTML")
-            bot.pin_chat_message(GROUP_ID, next_game_message.message_id)
     else:
         pass
 
+
+def job2():
+    try:
+        bot.pin_chat_message(GROUP_ID, 2)
+        bot.delete_message(msg.chat.id, msg.message_id + 1)
+    except Exception:
+        pass
+
 schedule.every().day.at("04:56").do(job)
-# schedule.every(5).seconds.do(job)
+# schedule.every().day.at("12:06").do(job2)
+schedule.every(5).seconds.do(job2)
+
 
 def go():
     while 1:
         schedule.run_pending()
         time.sleep(1)
 
+
 t = threading.Thread(target=go, name="test")
 t.start()
+
 
 # Test of bot
 
@@ -498,5 +530,6 @@ def triggers(msg):
     bot.delete_message(msg.chat.id, msg.message_id)
     bot.send_message(GROUP_ID, text.test_bot, parse_mode="HTML")
     print(text.test_bot)
+
 
 bot.polling(none_stop=True)
