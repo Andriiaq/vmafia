@@ -247,6 +247,7 @@ def triggers(msg):
 def triggers(msg):
     if not msg.new_chat_member.is_bot == True:
         if msg.chat.id == GROUP_ID:
+            bot.pin_chat_message(GROUP_ID, 2)
             uid = msg.new_chat_member.id
             keyboard = types.InlineKeyboardMarkup()
             url_button1 = types.InlineKeyboardButton(text="Правила", url="https://t.me/avmafia/34")
@@ -377,7 +378,6 @@ def add_user_active(msg):
         cur.execute("SELECT id FROM messages WHERE type = %s", [type_name])
         text_user_id = cur.fetchone()
         if msg.from_user.id in text_user_id and not msg.text == '!стоп':
-            print(msg.text)
             bot.send_message(GROUP_ID, msg.text, parse_mode="HTML")
         else:
             bot.send_message(GROUP_ID_ACTIVE, "Відправка повідомлення скасована...😕", parse_mode="HTML")
