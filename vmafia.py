@@ -25,8 +25,6 @@ GROUP_ID_ACTIVE = config.group_id_active
 # Active
 # cur.execute("DELETE FROM active")  # Удалить весь актив!!
 temp_uids = []
-cur.execute("SELECT uids FROM active")
-uids = [a[0] for a in cur.fetchall()]
 
 cur.execute("SELECT list FROM all_uids")
 all_uids = [b[0] for b in cur.fetchall()]
@@ -54,6 +52,8 @@ def active(msg):
             if len(uids) == 0:
                 bot.send_message(msg.chat.id, 'Будь першим')
             else:
+                cur.execute("SELECT uids FROM active")
+                uids = [a[0] for a in cur.fetchall()]
                 i = 0
                 link = ''
                 for uid in uids:
@@ -93,6 +93,8 @@ def active(msg):
 
 @bot.callback_query_handler(func=lambda c: True)
 def active(call):
+    cur.execute("SELECT uids FROM active")
+    uids = [a[0] for a in cur.fetchall()]
     uid = call.from_user.id
     temp_uid = call.from_user.id
     link = ""
@@ -142,8 +144,8 @@ def active(call):
 def triggers(msg):
     admins = [admin.user.id for admin in bot.get_chat_administrators(GROUP_ID)]
     if msg.from_user.id in admins:
-        cur.execute("SELECT list FROM all_uids")
         cur.execute("DELETE FROM active")  # Видалити весь актив
+        cur.execute("SELECT list FROM all_uids")
         cur.execute("INSERT INTO active (uids) SELECT list FROM all_uids")
         conn.commit()
         bot.send_message(msg.chat.id, text.alladdact)
@@ -158,7 +160,8 @@ def triggers(msg):
         admins = [admin.user.id for admin in bot.get_chat_administrators(GROUP_ID)]
         if msg.from_user.id in admins:
             uid = msg.reply_to_message.from_user.id
-            print(uid)
+            cur.execute("SELECT uids FROM active")
+            uids = [a[0] for a in cur.fetchall()]
             if not uid in uids:
                 if bot.get_chat_member(GROUP_ID, uid).status == 'member':
                     msg_delete = bot.send_message(msg.chat.id, text.addact)
@@ -193,7 +196,8 @@ def triggers(msg):
         admins = [admin.user.id for admin in bot.get_chat_administrators(GROUP_ID)]
         if msg.from_user.id in admins:
             uid = msg.reply_to_message.from_user.id
-            print(uid)
+            cur.execute("SELECT uids FROM active")
+            uids = [a[0] for a in cur.fetchall()]
             if uid in all_uids:
                 msg_delete = bot.send_message(msg.chat.id, text.delact)
                 cur.execute('DELETE FROM all_uids WHERE list = %s', [uid])
@@ -223,6 +227,8 @@ def triggers(msg):
     else:
         admins = [admin.user.id for admin in bot.get_chat_administrators(GROUP_ID)]
         if msg.from_user.id in admins:
+            cur.execute("SELECT uids FROM active")
+            uids = [a[0] for a in cur.fetchall()]
             uid = msg.reply_to_message.from_user.id
             if uid in uids:
                 msg_delete = bot.send_message(msg.chat.id, text.delact)
@@ -256,6 +262,8 @@ def triggers(msg):
                 bot.pin_chat_message(GROUP_ID, 2)  # закріпити правила
             except Exception:
                 pass
+            cur.execute("SELECT uids FROM active")
+            uids = [a[0] for a in cur.fetchall()]
             uid = msg.new_chat_member.id
             keyboard = types.InlineKeyboardMarkup()
             url_button1 = types.InlineKeyboardButton(text="Правила", url="https://t.me/avmafia/12")
@@ -298,6 +306,8 @@ def triggers(msg):
 @bot.message_handler(content_types=["left_chat_member"])
 def triggers(msg):
     if msg.chat.id == GROUP_ID:
+        cur.execute("SELECT uids FROM active")
+        uids = [a[0] for a in cur.fetchall()]
         uid = msg.left_chat_member.id
         if uid in uids:
             cur.execute('DELETE FROM active WHERE uids = %s', [uid])
@@ -395,9 +405,10 @@ def triggers(msg):
     else:
         admins = [admin.user.id for admin in bot.get_chat_administrators(GROUP_ID)]
         if msg.from_user.id in admins:
+            cur.execute("SELECT uids FROM active")
+            uids = [a[0] for a in cur.fetchall()]
             uid = msg.reply_to_message.from_user.id
             if uid in uids:
-                print(uid)
                 cur.execute('DELETE FROM active WHERE uids = %s', [uid])
                 cur.execute('DELETE FROM all_uids WHERE list = %s', [uid])
                 conn.commit()
