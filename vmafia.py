@@ -519,7 +519,7 @@ def job2():
 
 
 schedule.every().day.at("04:56").do(job)
-schedule.every().day.at("10:06").do(job2)
+schedule.every().day.at("08:22").do(job2)
 
 # schedule.every(5).seconds.do(job2)
 
