@@ -258,7 +258,7 @@ def triggers(msg):
                 pass
             uid = msg.new_chat_member.id
             keyboard = types.InlineKeyboardMarkup()
-            url_button1 = types.InlineKeyboardButton(text="Правила", url="https://t.me/avmafia/34")
+            url_button1 = types.InlineKeyboardButton(text="Правила", url="https://t.me/avmafia/12")
             url_button2 = types.InlineKeyboardButton(text="Як грати", url="https://t.me/avmafia/5")
             url_button3 = types.InlineKeyboardButton(text="Інструкція", url="https://t.me/avmafia/2")
             keyboard.add(url_button1, url_button2)
