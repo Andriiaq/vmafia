@@ -342,7 +342,8 @@ def triggers(msg):
         except Exception:
             delete_send_message = bot.send_message(msg.chat.id, text.not_pinned_terms, disable_web_page_preview=True, parse_mode='HTML')
             if msg.chat.id == GROUP_ID:
-                time.sleep(15)
+                bot.delete_message(msg.chat.id, msg.message_id)
+                time.sleep(10)
                 bot.delete_message(msg.chat.id, delete_send_message.message_id)
 
 @bot.message_handler(content_types=["pinned_message"])
