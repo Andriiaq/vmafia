@@ -70,7 +70,7 @@ def active(msg):
             bot.send_message(msg.chat.id, text=text.actext3, reply_markup=keyboard, parse_mode='html')
         else:
             msg_delete = bot.send_message(msg.chat.id, text=text.onlyact.format(msg.from_user.id), parse_mode="HTML")
-            time.sleep(5)
+            time.sleep(10)
             bot.delete_message(msg.chat.id, msg.message_id)
             bot.delete_message(msg.chat.id, msg_delete.message_id)
     ### АКТИВ АДМІНСЬКИЙ
@@ -325,6 +325,10 @@ def triggers(msg):
     print(message_pin.message_id)
 
 @bot.message_handler(regexp='!choice|!вибір|/choice|/вибір')
+def triggers(msg):
+    pass
+    # choice = m.txt[8:]
+    # choice = str(m.text).replace("!choice ","")
 
 @bot.message_handler(commands=['pin'])
 def triggers(msg):
@@ -337,9 +341,9 @@ def triggers(msg):
             delete_send_message = bot.send_message(msg.chat.id, text.pinned_terms, disable_web_page_preview=True, parse_mode='HTML')
         except Exception:
             delete_send_message = bot.send_message(msg.chat.id, text.not_pinned_terms, disable_web_page_preview=True, parse_mode='HTML')
-            # if msg.chat.id == GROUP_ID:
-                # time.sleep(10)
-                # bot.delete_message(msg.chat.id, delete_send_message.message_id)
+            if msg.chat.id == GROUP_ID:
+                time.sleep(15)
+                bot.delete_message(msg.chat.id, delete_send_message.message_id)
 
 @bot.message_handler(content_types=["pinned_message"])
 def triggers(msg):
