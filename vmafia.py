@@ -252,7 +252,10 @@ def triggers(msg):
 def triggers(msg):
     if not msg.new_chat_member.is_bot == True:
         if msg.chat.id == GROUP_ID:
-            bot.pin_chat_message(GROUP_ID, 2)  # закріпити правила
+            try:
+                bot.pin_chat_message(GROUP_ID, 2)  # закріпити правила
+            except Exception:
+                pass
             uid = msg.new_chat_member.id
             keyboard = types.InlineKeyboardMarkup()
             url_button1 = types.InlineKeyboardButton(text="Правила", url="https://t.me/avmafia/34")
@@ -328,7 +331,7 @@ def triggers(msg):
     if msg.from_user.id in admins:
         try:
             bot.delete_message(msg.chat.id, msg.message_id)
-            bot.pin_chat_message(GROUP_ID, 2)
+            bot.pin_chat_message(GROUP_ID, 2)  # закріпити правила
             delete_send_message = bot.send_message(msg.chat.id, text.pinned_terms, disable_web_page_preview=True, parse_mode='HTML')
             time.sleep(5)
             bot.delete_message(msg.chat.id, delete_send_message.message_id)
@@ -509,7 +512,11 @@ def job():
         pass
 
 def job2():
-    bot.pin_chat_message(GROUP_ID, 2)
+    try:
+        bot.pin_chat_message(GROUP_ID, 2)  # закріпити правила
+    except Exception:
+        pass
+
 
 schedule.every().day.at("04:56").do(job)
 schedule.every().day.at("10:06").do(job2)
