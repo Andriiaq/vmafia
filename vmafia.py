@@ -168,22 +168,22 @@ def triggers(msg):
                     cur.execute("INSERT INTO active (uids) VALUES (%s)", [uid])
                     cur.execute("INSERT INTO all_uids (list) VALUES (%s)", [uid])
                     uids.append(uid)
-                    time.sleep(30)
+                    time.sleep(10)
                     bot.delete_message(msg.chat.id, msg.message_id)
                     bot.delete_message(msg.chat.id, msg_delete.message_id)
                 else:
                     msg_delete = bot.send_message(msg.chat.id, text.nochatmember)
-                    time.sleep(30)
+                    time.sleep(10)
                     bot.delete_message(msg.chat.id, msg.message_id)
                     bot.delete_message(msg.chat.id, msg_delete.message_id)
             else:
                 msg_delete = bot.send_message(msg.chat.id, text.noaddact)
-                time.sleep(30)
+                time.sleep(10)
                 bot.delete_message(msg.chat.id, msg.message_id)
                 bot.delete_message(msg.chat.id, msg_delete.message_id)
         else:
             msg_delete = bot.send_message(msg.chat.id, text=text.onlyadm.format(msg.from_user.id), parse_mode="HTML")
-            time.sleep(30)
+            time.sleep(10)
             bot.delete_message(msg.chat.id, msg.message_id)
             bot.delete_message(msg.chat.id, msg_delete.message_id)
 
@@ -205,17 +205,17 @@ def triggers(msg):
                     cur.execute('DELETE FROM active WHERE uids = %s', [uid])
                     uids.remove(uid)
                 conn.commit()
-                time.sleep(30)
+                time.sleep(10)
                 bot.delete_message(msg.chat.id, msg.message_id)
                 bot.delete_message(msg.chat.id, msg_delete.message_id)
             else:
                 msg_delete = bot.send_message(msg.chat.id, text.delact)
-                time.sleep(30)
+                time.sleep(10)
                 bot.delete_message(msg.chat.id, msg.message_id)
                 bot.delete_message(msg.chat.id, msg_delete.message_id)
         else:
             msg_delete = bot.send_message(msg.chat.id, text=text.onlyadm.format(msg.from_user.id), parse_mode="HTML")
-            time.sleep(30)
+            time.sleep(10)
             bot.delete_message(msg.chat.id, msg.message_id)
             bot.delete_message(msg.chat.id, msg_delete.message_id)
 
