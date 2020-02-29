@@ -165,22 +165,22 @@ def triggers(msg):
                     cur.execute("INSERT INTO active (uids) VALUES (%s)", [uid])
                     cur.execute("INSERT INTO all_uids (list) VALUES (%s)", [uid])
                     uids.append(uid)
-                    time.sleep(3)
+                    time.sleep(30)
                     bot.delete_message(msg.chat.id, msg.message_id)
                     bot.delete_message(msg.chat.id, msg_delete.message_id)
                 else:
                     msg_delete = bot.send_message(msg.chat.id, text.nochatmember)
-                    time.sleep(3)
+                    time.sleep(30)
                     bot.delete_message(msg.chat.id, msg.message_id)
                     bot.delete_message(msg.chat.id, msg_delete.message_id)
             else:
                 msg_delete = bot.send_message(msg.chat.id, text.noaddact)
-                time.sleep(3)
+                time.sleep(30)
                 bot.delete_message(msg.chat.id, msg.message_id)
                 bot.delete_message(msg.chat.id, msg_delete.message_id)
         else:
             msg_delete = bot.send_message(msg.chat.id, text=text.onlyadm.format(msg.from_user.id), parse_mode="HTML")
-            time.sleep(5)
+            time.sleep(30)
             bot.delete_message(msg.chat.id, msg.message_id)
             bot.delete_message(msg.chat.id, msg_delete.message_id)
 
@@ -201,17 +201,17 @@ def triggers(msg):
                     cur.execute('DELETE FROM active WHERE uids = %s', [uid])
                     uids.remove(uid)
                 conn.commit()
-                time.sleep(3)
+                time.sleep(30)
                 bot.delete_message(msg.chat.id, msg.message_id)
                 bot.delete_message(msg.chat.id, msg_delete.message_id)
             else:
                 msg_delete = bot.send_message(msg.chat.id, text.delact)
-                time.sleep(3)
+                time.sleep(30)
                 bot.delete_message(msg.chat.id, msg.message_id)
                 bot.delete_message(msg.chat.id, msg_delete.message_id)
         else:
             msg_delete = bot.send_message(msg.chat.id, text=text.onlyadm.format(msg.from_user.id), parse_mode="HTML")
-            time.sleep(5)
+            time.sleep(30)
             bot.delete_message(msg.chat.id, msg.message_id)
             bot.delete_message(msg.chat.id, msg_delete.message_id)
 
@@ -229,17 +229,17 @@ def triggers(msg):
                 cur.execute('DELETE FROM active WHERE uids = %s', [uid])
                 conn.commit()
                 uids.remove(uid)
-                time.sleep(3)
+                time.sleep(30)
                 bot.delete_message(msg.chat.id, msg.message_id)
                 bot.delete_message(msg.chat.id, msg_delete.message_id)
             else:
                 msg_delete = bot.send_message(msg.chat.id, text.delact)
-                time.sleep(3)
+                time.sleep(30)
                 bot.delete_message(msg.chat.id, msg.message_id)
                 bot.delete_message(msg.chat.id, msg_delete.message_id)
         else:
             msg_delete = bot.send_message(msg.chat.id, text=text.onlyadm.format(msg.from_user.id), parse_mode="HTML")
-            time.sleep(5)
+            time.sleep(30)
             bot.delete_message(msg.chat.id, msg.message_id)
             bot.delete_message(msg.chat.id, msg_delete.message_id)
 
@@ -335,14 +335,11 @@ def triggers(msg):
         try:
             bot.pin_chat_message(GROUP_ID, 2)  # закріпити правила
             delete_send_message = bot.send_message(msg.chat.id, text.pinned_terms, disable_web_page_preview=True, parse_mode='HTML')
-            if msg.chat.id == GROUP_ID:
-                time.sleep(5)
-                bot.delete_message(msg.chat.id, delete_send_message.message_id)
         except Exception:
             delete_send_message = bot.send_message(msg.chat.id, text.not_pinned_terms, disable_web_page_preview=True, parse_mode='HTML')
-            if msg.chat.id == GROUP_ID:
-                time.sleep(5)
-                bot.delete_message(msg.chat.id, delete_send_message.message_id)
+            # if msg.chat.id == GROUP_ID:
+                # time.sleep(10)
+                # bot.delete_message(msg.chat.id, delete_send_message.message_id)
 
 @bot.message_handler(content_types=["pinned_message"])
 def triggers(msg):
