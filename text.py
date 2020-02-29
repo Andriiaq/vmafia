@@ -79,6 +79,6 @@ hello = '''Вітаємо, мирний, одягай мотузку та вла
 #
 # Guide
 
-guide1 = '<b><a href="tg://user?id={}">{}</a></b>, читай <a href="https://t.me/avmafia/5">гайд</a> та <a href="https://t.me/avmafia/12">правила</a>. Інакше отримаєш на горіхи. ♥️'
+guide1 = '<b><a href="tg://user?id={}">{}</a></b>, читай <a href="https://t.me/avmafia/5">гайд</a> та <a href="https://t.me/avmafia/12">правила</a>. Інакше отримаєш на горіхи.♥️'
 
-guide2 = 'Читайте <a href="https://t.me/avmafia/5">гайд</a> та <a href="https://t.me/avmafia/12">правила</a>. Інакше отримаєте на горіхи. ♥️'
+guide2 = 'Читайте <a href="https://t.me/avmafia/5">гайд</a> та <a href="https://t.me/avmafia/12">правила</a>. Інакше отримаєте на горіхи.♥️'
