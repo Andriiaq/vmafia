@@ -41,6 +41,8 @@ def active(msg):
     if msg.chat.id == GROUP_ID:
         if not bot.get_chat_member(GROUP_ID_ACTIVE, msg.from_user.id).status == 'left':
             temp_uids.clear()
+            cur.execute("SELECT uids FROM active")
+            uids = [a[0] for a in cur.fetchall()]
             bot.send_message(msg.chat.id, text=text.actext1, parse_mode='html')
             keyboard = types.InlineKeyboardMarkup()
             keyboard.row(
@@ -52,8 +54,6 @@ def active(msg):
             if len(uids) == 0:
                 bot.send_message(msg.chat.id, 'Будь першим')
             else:
-                cur.execute("SELECT uids FROM active")
-                uids = [a[0] for a in cur.fetchall()]
                 i = 0
                 link = ''
                 for uid in uids:
