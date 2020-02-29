@@ -324,21 +324,25 @@ def triggers(msg):
     message_pin = bot.get_chat(GROUP_ID).pinned_message
     print(message_pin.message_id)
 
+@bot.message_handler(regexp='!choice|!вибір|/choice|/вибір')
 
 @bot.message_handler(commands=['pin'])
 def triggers(msg):
     admins = [admin.user.id for admin in bot.get_chat_administrators(GROUP_ID)]
     if msg.from_user.id in admins:
-        try:
+        if msg.chat.id == GROUP_ID:
             bot.delete_message(msg.chat.id, msg.message_id)
+        try:
             bot.pin_chat_message(GROUP_ID, 2)  # закріпити правила
             delete_send_message = bot.send_message(msg.chat.id, text.pinned_terms, disable_web_page_preview=True, parse_mode='HTML')
-            time.sleep(5)
-            bot.delete_message(msg.chat.id, delete_send_message.message_id)
+            if msg.chat.id == GROUP_ID:
+                time.sleep(5)
+                bot.delete_message(msg.chat.id, delete_send_message.message_id)
         except Exception:
             delete_send_message = bot.send_message(msg.chat.id, text.not_pinned_terms, disable_web_page_preview=True, parse_mode='HTML')
-            time.sleep(5)
-            bot.delete_message(msg.chat.id, delete_send_message.message_id)
+            if msg.chat.id == GROUP_ID:
+                time.sleep(5)
+                bot.delete_message(msg.chat.id, delete_send_message.message_id)
 
 @bot.message_handler(content_types=["pinned_message"])
 def triggers(msg):
@@ -519,7 +523,8 @@ def job2():
 
 
 schedule.every().day.at("04:56").do(job)
-schedule.every().day.at("08:22").do(job2)
+schedule.every().day.at("10:06").do(job2)
+schedule.every().day.at("23:06").do(job2)
 
 # schedule.every(5).seconds.do(job2)
 
