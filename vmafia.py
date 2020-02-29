@@ -334,8 +334,8 @@ def triggers(msg):
 def triggers(msg):
     admins = [admin.user.id for admin in bot.get_chat_administrators(GROUP_ID)]
     if msg.from_user.id in admins:
-        if msg.chat.id == GROUP_ID:
-            bot.delete_message(msg.chat.id, msg.message_id)
+        # if msg.chat.id == GROUP_ID:
+        #    bot.delete_message(msg.chat.id, msg.message_id)
         try:
             bot.pin_chat_message(GROUP_ID, 2)  # закріпити правила
             delete_send_message = bot.send_message(msg.chat.id, text.pinned_terms, disable_web_page_preview=True, parse_mode='HTML')
@@ -452,7 +452,7 @@ def triggers(msg):
         bot.delete_message(msg.chat.id, msg.message_id)
         delete_send_message = bot.send_message(msg.chat.id, text=text.onlyadm.format(msg.from_user.id),
                                                parse_mode="HTML")
-        time.sleep(5)
+        time.sleep(10)
         bot.delete_message(msg.chat.id, delete_send_message.message_id)
 
 
@@ -474,7 +474,7 @@ def triggers(msg):
         bot.delete_message(msg.chat.id, msg.message_id)
         delete_send_message = bot.send_message(msg.chat.id, text=text.onlyadm.format(msg.from_user.id),
                                                parse_mode="HTML")
-        time.sleep(5)
+        time.sleep(10)
         bot.delete_message(msg.chat.id, delete_send_message.message_id)
 
 
@@ -496,7 +496,7 @@ def triggers(msg):
         bot.delete_message(msg.chat.id, msg.message_id)
         delete_send_message = bot.send_message(msg.chat.id, text=text.onlyadm.format(msg.from_user.id),
                                                parse_mode="HTML")
-        time.sleep(5)
+        time.sleep(10)
         bot.delete_message(msg.chat.id, delete_send_message.message_id)
 
 
