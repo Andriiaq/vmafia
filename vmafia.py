@@ -321,8 +321,7 @@ def triggers(msg):
 
 @bot.message_handler(commands=['print'])
 def triggers(msg):
-    message_pin = bot.get_chat(GROUP_ID).pinned_message
-    print(message_pin.message_id)
+    print(msg.reply_to_message)
 
 @bot.message_handler(regexp='!choice|!вибір|/choice|/вибір')
 def triggers(msg):
@@ -338,7 +337,7 @@ def triggers(msg):
         #    bot.delete_message(msg.chat.id, msg.message_id)
         try:
             bot.pin_chat_message(GROUP_ID, 2)  # закріпити правила
-            delete_send_message = bot.send_message(msg.chat.id, text.pinned_terms, disable_web_page_preview=True, parse_mode='HTML')
+            bot.send_message(msg.chat.id, text.pinned_terms, disable_web_page_preview=True, parse_mode='HTML')
         except Exception:
             delete_send_message = bot.send_message(msg.chat.id, text.not_pinned_terms, disable_web_page_preview=True, parse_mode='HTML')
             if msg.chat.id == GROUP_ID:
@@ -353,7 +352,6 @@ def triggers(msg):
         bot.delete_message(msg.chat.id, msg.message_id)
 
 
-
 @bot.message_handler(commands=['гра'])
 def triggers(msg):
     admins = [admin.user.id for admin in bot.get_chat_administrators(GROUP_ID)]
@@ -364,25 +362,28 @@ def triggers(msg):
         bot.pin_chat_message(GROUP_ID, next_game_message.message_id)
 
 
-@bot.message_handler(commands=['гайд', 'guide'])
+@bot.message_handler(regexp='/гайд|!гайд|/правила|!правила')
 def triggers(msg):
-    cid = msg.chat.id
     keyboard = types.InlineKeyboardMarkup()
-    url_button = types.InlineKeyboardButton(text='Читати правила', url='https://t.me/mafia_pravyla')
-    keyboard.add(url_button)
-    send_message = bot.send_message(cid, text=text.guide, parse_mode='HTML', reply_markup=keyboard)
-    new_bot_message_id = send_message.message_id
-    type_name = 'guide'
-    ##### Вибрати та видалити id повідомлення
-    cur.execute("SELECT id FROM messages WHERE type = %s", [type_name])
-    old_bot_message_id = cur.fetchone()
-    try:
-        bot.delete_message(msg.chat.id, old_bot_message_id)
-    except Exception:
-        pass
-    cur.execute("UPDATE messages SET id = %s WHERE type = %s", [new_bot_message_id, type_name])
-    conn.commit()
-    ##### Зберегти id поста
+    url_button1 = types.InlineKeyboardButton(text='Як грати', url='https://t.me/avmafia/5')
+    url_button2 = types.InlineKeyboardButton(text='Правила', url='https://t.me/avmafia/12')
+    keyboard.add(url_button1, url_button2)
+    if not msg.reply_to_message is None:
+        bot.send_message(msg.chat.id, text.guide1.format(msg.reply_to_message.from_user.id, msg.reply_to_message.from_user.first_name), disable_web_page_preview=True, parse_mode="HTML", reply_markup=keyboard)
+    else:
+        send_message = bot.send_message(msg.chat.id, text.guide2.format(msg.from_user.id, msg.from_user.first_name), disable_web_page_preview=True, parse_mode="HTML", reply_markup=keyboard)
+        new_bot_message_id = send_message.message_id
+        type_name = 'guide'
+        ##### Вибрати та видалити id повідомлення
+        cur.execute("SELECT id FROM messages WHERE type = %s", [type_name])
+        old_bot_message_id = cur.fetchone()
+        try:
+            bot.delete_message(msg.chat.id, old_bot_message_id)
+        except Exception:
+            pass
+        cur.execute("UPDATE messages SET id = %s WHERE type = %s", [new_bot_message_id, type_name])
+        conn.commit()
+        ##### Зберегти id поста
 
 
 # kick ban COMBOT
