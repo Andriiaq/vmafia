@@ -368,7 +368,7 @@ def triggers(msg):
     url_button1 = types.InlineKeyboardButton(text='Як грати', url='https://t.me/avmafia/5')
     url_button2 = types.InlineKeyboardButton(text='Правила', url='https://t.me/avmafia/12')
     keyboard.add(url_button1, url_button2)
-    if not msg.reply_to_message is None:
+    if not msg.reply_to_message is None and not msg.reply_to_message.from_user.is_bot == True:
         bot.send_message(msg.chat.id, text.guide1.format(msg.reply_to_message.from_user.id, msg.reply_to_message.from_user.first_name), disable_web_page_preview=True, parse_mode="HTML", reply_markup=keyboard)
     else:
         send_message = bot.send_message(msg.chat.id, text.guide2.format(msg.from_user.id, msg.from_user.first_name), disable_web_page_preview=True, parse_mode="HTML", reply_markup=keyboard)
