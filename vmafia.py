@@ -163,7 +163,7 @@ def triggers(msg):
             cur.execute("SELECT uids FROM active")
             uids = [a[0] for a in cur.fetchall()]
             if not uid in uids:
-                if bot.get_chat_member(GROUP_ID, uid).status == 'member':
+                if not bot.get_chat_member(GROUP_ID, uid).status == 'left':
                     msg_delete = bot.send_message(msg.chat.id, text.addact)
                     cur.execute("INSERT INTO active (uids) VALUES (%s)", [uid])
                     cur.execute("INSERT INTO all_uids (list) VALUES (%s)", [uid])
