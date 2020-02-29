@@ -330,7 +330,7 @@ def triggers(msg):
     # choice = m.txt[8:]
     # choice = str(m.text).replace("!choice ","")
 
-@bot.message_handler(commands=['pin'])
+@bot.message_handler(regexp='/pin|!pin')
 def triggers(msg):
     admins = [admin.user.id for admin in bot.get_chat_administrators(GROUP_ID)]
     if msg.from_user.id in admins:
