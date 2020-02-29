@@ -356,7 +356,8 @@ def triggers(msg):
 def triggers(msg):
     admins = [admin.user.id for admin in bot.get_chat_administrators(GROUP_ID)]
     if msg.from_user.id in admins:
-        bot.delete_message(msg.chat.id, msg.message_id)
+        if msg.chat.id == GROUP_ID:
+            bot.delete_message(msg.chat.id, msg.message_id)
         next_game_message = bot.send_message(GROUP_ID, text.next_game, parse_mode="HTML")
         bot.pin_chat_message(GROUP_ID, next_game_message.message_id)
 
@@ -511,7 +512,7 @@ def job():
             next_game_message = bot.send_message(GROUP_ID, text.good_morning_1, parse_mode="HTML")
             bot.pin_chat_message(GROUP_ID, next_game_message.message_id)
         elif 0 in good_morning_value1:
-            next_game_message = bot.send_message(GROUP_ID, text.good_morning_0, parse_mode="HTML")
+            bot.send_message(GROUP_ID, text.good_morning_0, parse_mode="HTML")
     else:
         pass
 
