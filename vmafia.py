@@ -106,6 +106,8 @@ def active(call):
                 bot.answer_callback_query(callback_query_id=call.id, text='Ти вже є у активі.')
             else:
                 cur.execute("INSERT INTO active (uids) VALUES (%s)", [call.from_user.id])
+                if not uid in list:
+                    cur.execute("INSERT INTO all_uids (list) VALUES (%s)", [uid])
                 conn.commit()
                 uids.append(uid)
                 bot.answer_callback_query(callback_query_id=call.id, text='Тебе додано в наступний актив.')
@@ -166,7 +168,8 @@ def triggers(msg):
                 if not bot.get_chat_member(GROUP_ID, uid).status == 'left':
                     msg_delete = bot.send_message(msg.chat.id, text.addact)
                     cur.execute("INSERT INTO active (uids) VALUES (%s)", [uid])
-                    cur.execute("INSERT INTO all_uids (list) VALUES (%s)", [uid])
+                    if not uid in list:
+                        cur.execute("INSERT INTO all_uids (list) VALUES (%s)", [uid])
                     uids.append(uid)
                     time.sleep(10)
                     bot.delete_message(msg.chat.id, msg.message_id)
