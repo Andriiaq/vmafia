@@ -365,7 +365,7 @@ def triggers(msg):
         bot.delete_message(msg.chat.id, msg.message_id)
 
 
-@bot.message_handler(commands=['гра'])
+@bot.message_handler(regexp='/гра|!гра')
 def triggers(msg):
     admins = [admin.user.id for admin in bot.get_chat_administrators(GROUP_ID)]
     if msg.from_user.id in admins:
@@ -463,7 +463,6 @@ def triggers(msg):
             bot.pin_chat_message(GROUP_ID, next_game_message.message_id)
         elif 0 in good_morning_value:
             next_game_message = bot.send_message(GROUP_ID, text.good_morning_0, parse_mode="HTML")
-            bot.pin_chat_message(GROUP_ID, next_game_message.message_id)
     else:
         bot.delete_message(msg.chat.id, msg.message_id)
         delete_send_message = bot.send_message(msg.chat.id, text=text.onlyadm.format(msg.from_user.id),
