@@ -26,9 +26,6 @@ GROUP_ID_ACTIVE = config.group_id_active
 # cur.execute("DELETE FROM active")  # Удалить весь актив!!
 temp_uids = []
 
-cur.execute("SELECT list FROM all_uids")
-all_uids = [b[0] for b in cur.fetchall()]
-
 cur.execute("SELECT uids_admins FROM active_admins")
 uids_admins = [a[0] for a in cur.fetchall()]
 
@@ -95,6 +92,8 @@ def active(msg):
 def active(call):
     cur.execute("SELECT uids FROM active")
     uids = [a[0] for a in cur.fetchall()]
+    cur.execute("SELECT list FROM all_uids")
+    all_uids = [b[0] for b in cur.fetchall()]
     uid = call.from_user.id
     temp_uid = call.from_user.id
     link = ""
@@ -164,6 +163,8 @@ def triggers(msg):
             uid = msg.reply_to_message.from_user.id
             cur.execute("SELECT uids FROM active")
             uids = [a[0] for a in cur.fetchall()]
+            cur.execute("SELECT list FROM all_uids")
+            all_uids = [b[0] for b in cur.fetchall()]
             if not uid in uids:
                 if not bot.get_chat_member(GROUP_ID, uid).status == 'left':
                     msg_delete = bot.send_message(msg.chat.id, text.addact)
@@ -201,6 +202,8 @@ def triggers(msg):
             uid = msg.reply_to_message.from_user.id
             cur.execute("SELECT uids FROM active")
             uids = [a[0] for a in cur.fetchall()]
+            cur.execute("SELECT list FROM all_uids")
+            all_uids = [b[0] for b in cur.fetchall()]
             if uid in all_uids:
                 msg_delete = bot.send_message(msg.chat.id, text.delact)
                 cur.execute('DELETE FROM all_uids WHERE list = %s', [uid])
@@ -267,6 +270,8 @@ def triggers(msg):
                 pass
             cur.execute("SELECT uids FROM active")
             uids = [a[0] for a in cur.fetchall()]
+            cur.execute("SELECT list FROM all_uids")
+            all_uids = [b[0] for b in cur.fetchall()]
             uid = msg.new_chat_member.id
             keyboard = types.InlineKeyboardMarkup()
             url_button1 = types.InlineKeyboardButton(text="Правила", url="https://t.me/avmafia/12")
@@ -311,6 +316,8 @@ def triggers(msg):
     if msg.chat.id == GROUP_ID:
         cur.execute("SELECT uids FROM active")
         uids = [a[0] for a in cur.fetchall()]
+        cur.execute("SELECT list FROM all_uids")
+        all_uids = [b[0] for b in cur.fetchall()]
         uid = msg.left_chat_member.id
         if uid in uids:
             cur.execute('DELETE FROM active WHERE uids = %s', [uid])
