@@ -563,7 +563,7 @@ t.start()
 
 # Test of bot
 
-@bot.message_handler(regexp='test')
+@bot.message_handler(regexp='!test')
 def triggers(msg):
     bot.delete_message(msg.chat.id, msg.message_id)
     bot.send_message(GROUP_ID, text.test_bot, parse_mode="HTML")
