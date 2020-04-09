@@ -264,10 +264,10 @@ def triggers(msg):
 def triggers(msg):
     if not msg.new_chat_member.is_bot == True:
         if msg.chat.id == GROUP_ID:
-            try:
-                bot.pin_chat_message(GROUP_ID, 2)  # закріпити правила
-            except Exception:
-                pass
+            #try:
+            #    bot.pin_chat_message(GROUP_ID, 2)  # закріпити правила
+            #except Exception:
+            #    pass
             cur.execute("SELECT uids FROM active")
             uids = [a[0] for a in cur.fetchall()]
             cur.execute("SELECT list FROM all_uids")
@@ -451,6 +451,7 @@ def add_user_active(msg):
         text_user_id = cur.fetchone()
         if msg.from_user.id in text_user_id and not msg.text == '!стоп':
             bot.send_message(GROUP_ID, msg.text, parse_mode="HTML")
+            bot.send_message(GROUP_ID_ACTIVE, "Повідомлення відправлено.😁", parse_mode="HTML")
         else:
             bot.send_message(GROUP_ID_ACTIVE, "Відправка повідомлення скасована...😕", parse_mode="HTML")
         step[true] = 0
@@ -547,8 +548,8 @@ def job2():
 
 
 schedule.every().day.at("04:56").do(job)
-schedule.every().day.at("10:06").do(job2)
-schedule.every().day.at("23:06").do(job2)
+#schedule.every().day.at("10:06").do(job2)
+#schedule.every().day.at("23:06").do(job2)
 
 # schedule.every(5).seconds.do(job2)
 
